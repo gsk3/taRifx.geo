@@ -1,0 +1,33 @@
+Package: taRifx.geo
+Type: Package
+Title: Collection of various spatial functions
+Version: 1.0.4
+Date: 2012-08-02
+Author: Ari B. Friedman
+Maintainer: Ari B. Friedman <abfriedman@gmail.com>
+Description: A collection of miscellaneous spatial object manipulation functions
+License: GPL (>= 2)
+LazyLoad: yes
+Suggests:
+    gdata,
+    fields,
+    maps,
+    geoR,
+    maptools,
+    shapefiles,
+    spatial,
+    mapproj,
+    akima,
+    mgcv,
+    caTools,
+    pspline,
+    RCurl,
+    RJSONIO
+Depends:
+    taRifx,
+    sp,
+    plyr,
+    reshape2
+Collate:
+    'Contributed.R'
+    'R-GIS.R'
