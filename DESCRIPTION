@@ -1,8 +1,8 @@
 Package: taRifx.geo
 Type: Package
 Title: Collection of various spatial functions
-Version: 1.0.4
-Date: 2012-08-02
+Version: 1.0.5
+Date: 2012-08-18
 Author: Ari B. Friedman
 Maintainer: Ari B. Friedman <abfriedman@gmail.com>
 Description: A collection of miscellaneous spatial object manipulation functions

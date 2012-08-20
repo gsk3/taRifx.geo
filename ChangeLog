@@ -1,3 +1,8 @@
 Change log version 1.0.4
 
 - Initial release (derived from taRifx 1.0.3, where these functions previously resided)
+
+
+Change log version 1.0.5
+- Changed countPointsInPolys() to use over() rather than the deprecated overlay()
+- Added test_that unit tests

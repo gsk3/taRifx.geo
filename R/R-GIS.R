@@ -5,11 +5,6 @@
 # 8/02/2012
 
 
-
-# -*- Define functions for use by other programs -*-
-
-
-
 #'Cartesian distance between points
 #'
 #'@aliases simpledist
@@ -248,17 +243,17 @@ SPDFareas = function(SPDF,colname="AREA") {
 #'@seealso See Also as \code{\link[sp]{overlay}}
 #'@export countPointsInPolys
 countPointsInPolys = function(points,polys,density=FALSE) {
-  grid_count = overlay(x=points,y=polys) # this returns a vector of the same length as points saying which polygon ID they're in
-  #-Count points in each polygon (rownames are polygon ID)
-  pointcount=tapply(grid_count,grid_count,length)
-  #Shift the rownames so they start at 0 instead of 1 like the other functions return
-  rownames(pointcount) <- as.character(as.numeric(rownames(pointcount))-1)
+  overlay <- over( points, polys, returnList=TRUE) # need to use `,returnList` to get the rownames to be the polygon IDs
+  overlayIDs <- unlist(lapply( overlay, function(x) rownames(x) )) # vector of polygon IDs, repeated if there's more than one point in the polygon
+  pointcount <- unclass(table(overlayIDs))
   #- Merge with polygons data.frame
-  pointcount.df = data.frame(pointcount,rownames=rownames(pointcount),stringsAsFactors=FALSE)
-  polys.df = data.frame(polys@data,rownames=rownames(polys@data),stringsAsFactors=FALSE)
-  DF = merge(polys.df,pointcount.df,all=TRUE,by.x="rownames")
-  DF = DF[order(as.numeric(DF$rownames)),] # sort it
+  pointcount.df <- data.frame(pointcount,rownames=rownames(pointcount),stringsAsFactors=FALSE)
+  polys.df <- data.frame(polys@data,rownames=rownames(polys@data),stringsAsFactors=FALSE)
+  DF <- merge(polys.df,pointcount.df,all.x=TRUE,by.x="rownames")
+  if(nrow(DF)!=nrow(polys@data)) stop("Rows created/deleted while merging in the count data.")
+  DF <- DF[order(as.numeric(DF$rownames)),] # sort it
   rownames(DF) <- DF$rownames
+  DF <- DF[,!colnames(DF) %in% "rownames"]
   DF$pointcount <- as.numeric(DF$pointcount)
   returnSPDF = SpatialPolygonsDataFrame(polygons(polys),data=DF,match.ID=TRUE)
   return(returnSPDF)
@@ -481,4 +476,20 @@ SPDFtoPointsDF <- function(SPDF) {
 	coords <- SPDF@coords
 	colnames(coords) <- c("x","y")
 	return(cbind(SPDF@data,coords))
+}
+
+#'A better rbind function for SpatialPolygonsDataFrames
+#'
+#'Solves the problem with maptools' rbind in which SPDFs with identical polygon IDs cannot be bound
+#'
+#'@param \dots SPDF objects
+#'@return A SpatialPolygonsDataFrame
+#'@method rbind SpatialPolygonsDataFrame
+#'@export rbind.SpatialPolygonsDataFrame
+rbind.SpatialPolygonsDataFrame <- function (..., makeUniqueIDs=FALSE)  {
+  dots <- list(...)
+  names(dots) <- NULL
+  pl <- do.call( "rbind", c( lapply(dots, function(x) as(x, "SpatialPolygons")), makeUniqueIDs=makeUniqueIDs) )
+  df <- do.call("rbind", lapply(dots, function(x) x@data))
+  SpatialPolygonsDataFrame(pl, df)
 }
