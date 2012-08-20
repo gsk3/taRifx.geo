@@ -6,3 +6,5 @@ Change log version 1.0.4
 Change log version 1.0.5
 - Changed countPointsInPolys() to use over() rather than the deprecated overlay()
 - Added test_that unit tests
+- Added Bing Maps API capabilities to geocoding functions
+- Added georouting between multiple waypoints via Bing Maps API
