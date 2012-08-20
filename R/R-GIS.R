@@ -477,19 +477,3 @@ SPDFtoPointsDF <- function(SPDF) {
 	colnames(coords) <- c("x","y")
 	return(cbind(SPDF@data,coords))
 }
-
-#'A better rbind function for SpatialPolygonsDataFrames
-#'
-#'Solves the problem with maptools' rbind in which SPDFs with identical polygon IDs cannot be bound
-#'
-#'@param \dots SPDF objects
-#'@return A SpatialPolygonsDataFrame
-#'@method rbind SpatialPolygonsDataFrame
-#'@export rbind.SpatialPolygonsDataFrame
-rbind.SpatialPolygonsDataFrame <- function (..., makeUniqueIDs=FALSE)  {
-  dots <- list(...)
-  names(dots) <- NULL
-  pl <- do.call( "rbind", c( lapply(dots, function(x) as(x, "SpatialPolygons")), makeUniqueIDs=makeUniqueIDs) )
-  df <- do.call("rbind", lapply(dots, function(x) x@data))
-  SpatialPolygonsDataFrame(pl, df)
-}
