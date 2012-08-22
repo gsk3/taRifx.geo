@@ -34,6 +34,7 @@ geocode <- function( x, verbose=FALSE, service="google", ... ) {
 #'@method geocode default
 #'@S3method geocode default
 geocode.default <- function(x,verbose=FALSE, service="google", ...) {
+  if(x=="") return(c(NA,NA))
   # Input regularization and checking
   service <- tolower(service)
   BingMapsKey <- getOption("BingMapsKey")
@@ -50,7 +51,7 @@ geocode.default <- function(x,verbose=FALSE, service="google", ...) {
     u <- paste0(root, "?query=", address, "&maxResults=",maxResults,"&key=",BingMapsKey)
     return(URLencode(u))
   }
-  if(verbose) message(x)
+  if(verbose) message(x,appendLF=FALSE)
   u <- construct.geocode.url[[service]](x)
   doc <- getURL(u)
   j <- fromJSON(doc,simplify = FALSE)
@@ -67,13 +68,23 @@ geocode.default <- function(x,verbose=FALSE, service="google", ...) {
     }
   }
   parse.json[["bing"]] <- function(j) {
-    if(j$authenticationResultCode != "ValidCredentials") stop("Your BingMapsKey was not accepted.\n")
-    if(j$statusDescription!="OK") stop("Something went wrong. Bing Maps API return status code ",j$statusCode," - ", j$statusDescription,"\n")
-    if(verbose) message(" - Confidence: ", j$resourceSets[[1]]$resources[[1]]$confidence)
+    if(j$authenticationResultCode != "ValidCredentials") {
+      warning("Your BingMapsKey was not accepted.\n")
+      return(c(NA,NA))
+    }
+    if(j$statusDescription!="OK") {
+      warning("Something went wrong. Bing Maps API return status code ",j$statusCode," - ", j$statusDescription,"\n")
+      return(c(NA,NA))
+    }
+    if(j$resourceSets[[1]]$estimatedTotal==0) {
+      warning("Didn't find any points")
+      return(c(NA,NA))
+    }
+    if(verbose) message(" - Confidence: ", j$resourceSets[[1]]$resources[[1]]$confidence ,appendLF=FALSE)
     unlist(j$resourceSets[[1]]$resources[[1]]$point$coordinates)
   }
   res <- parse.json[[service]](j)
-  if(verbose) message("\n")
+  if(verbose) message("\n",appendLF=FALSE)
   return( res )
 }
 #'@rdname geocode
@@ -139,7 +150,7 @@ georoute.default <- function( x, verbose=FALSE, service="bing", returntype="all"
                 "&key=",BingMapsKey)
     return(URLencode(u))
   }
-  if(verbose) message(x)
+  if(verbose) message(x,appendLF=FALSE)
   u <- construct.georoute.url[[service]](x)
   doc <- getURL(u)
   j <- fromJSON(doc,simplify = FALSE)
@@ -149,14 +160,14 @@ georoute.default <- function( x, verbose=FALSE, service="bing", returntype="all"
     if(j$authenticationResultCode != "ValidCredentials") stop("Your BingMapsKey was not accepted.\n")
     if(j$statusDescription!="OK") stop("Something went wrong. Bing Maps API return status code ",j$statusCode," - ", j$statusDescription,"\n")
     rt <- j$resourceSets[[1]]$resources[[1]]
-    if(verbose) message(" - Confidence: ", rt$routeLegs[[1]]$startLocation$confidence)
-    if(verbose) message(" - Distance unit: ", rt$distanceUnit, " Time unit:", rt$durationUnit )
+    if(verbose) message(" - Confidence: ", rt$routeLegs[[1]]$startLocation$confidence,appendLF=FALSE)
+    if(verbose) message(" - Distance unit: ", rt$distanceUnit, " Time unit:", rt$durationUnit ,appendLF=FALSE)
     if(returntype=="all") return(rt$routeLegs[[1]])
     if(returntype=="path") return( t(sapply(rt$routePath$line$coordinates, unlist)) )
     if(returntype=="distance") return(rt$travelDistance)
     if(returntype=="time") return(rt$travelDuration)
   }
   res <- parse.json[[service]](j)
-  if(verbose) message("\n")
+  if(verbose) message("\n",appendLF=FALSE)
   return( res )
 }
