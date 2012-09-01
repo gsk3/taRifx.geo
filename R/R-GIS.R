@@ -239,24 +239,49 @@ SPDFareas = function(SPDF,colname="AREA") {
 #'@param polys SpatialPolygonsDataFrame
 #'@param density Return a density (point count divided by area) instead of a
 #'point count
+#'@param by Factor to return counts by.  For instance, if by is 
+#'a factor with two levels, instead of a single count variable being returned, two variables will be returned--
+#'the count of point type A in the polygon, and the count of point type B.  The by factor must be of length length(points).
 #'@return SpatialPolygonsDataFrame
 #'@seealso See Also as \code{\link[sp]{overlay}}
 #'@export countPointsInPolys
-countPointsInPolys = function(points,polys,density=FALSE) {
-  overlay <- over( points, polys, returnList=TRUE) # need to use `,returnList` to get the rownames to be the polygon IDs
-  overlayIDs <- unlist(lapply( overlay, function(x) rownames(x) )) # vector of polygon IDs, repeated if there's more than one point in the polygon
-  pointcount <- unclass(table(overlayIDs))
+countPointsInPolys = function(points,polys,density=FALSE,by=NULL) {
+  countpoints <- function(points,polys) {
+    overlay <- over( points, polys, returnList=TRUE) # need to use `,returnList` to get the rownames to be the polygon IDs
+    overlayIDs <- unlist(lapply( overlay, function(x) rownames(x) )) # vector of polygon IDs, repeated if there's more than one point in the polygon
+    unclass(table(overlayIDs))
+  }
+  if(is.null(by)) {
+    pointcount <- countpoints(points,polys)
+    pointcount.df <- data.frame( pointcount=pointcount, rownames=rownames(pointcount), stringsAsFactors=FALSE )
+  } else { # count by levels
+    lvls <- levels(by)
+    for(l in lvls) {
+      pts <- subset(points,by==l)
+      pointcount <- countpoints(pts,polys)
+      pointcount.new <- data.frame( pointcount=pointcount, rownames=rownames(pointcount), stringsAsFactors=FALSE )
+      colnames(pointcount.new)[1] <- paste0("pointcount.",l)
+      if(l==lvls[1]) {
+        pointcount.df <- pointcount.new
+      } else{
+        pointcount.df <- merge(pointcount.df,pointcount.new,all.x=TRUE,all.y=TRUE,by="rownames")
+      }
+    }
+  }
   #- Merge with polygons data.frame
-  pointcount.df <- data.frame(pointcount,rownames=rownames(pointcount),stringsAsFactors=FALSE)
   polys.df <- data.frame(polys@data,rownames=rownames(polys@data),stringsAsFactors=FALSE)
   DF <- merge(polys.df,pointcount.df,all.x=TRUE,by.x="rownames")
   if(nrow(DF)!=nrow(polys@data)) stop("Rows created/deleted while merging in the count data.")
   DF <- DF[order(as.numeric(DF$rownames)),] # sort it
   rownames(DF) <- DF$rownames
   DF <- DF[,!colnames(DF) %in% "rownames"]
-  DF$pointcount <- as.numeric(DF$pointcount)
-  returnSPDF = SpatialPolygonsDataFrame(polygons(polys),data=DF,match.ID=TRUE)
-  return(returnSPDF)
+  pc.cols <- grepl("pointcount",colnames(DF)) # selector for pointcount column(s)
+  DF[,pc.cols] <- sapply( DF[,pc.cols], function(x) {
+    x <- as.numeric(x)
+    x[is.na(x)] <- 0
+    x
+  } )
+  SpatialPolygonsDataFrame(polygons(polys),data=DF,match.ID=TRUE)
 }
 
 

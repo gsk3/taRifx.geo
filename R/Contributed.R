@@ -91,9 +91,24 @@ geocode.default <- function(x,verbose=FALSE, service="google", ...) {
 #'@method geocode data.frame
 #'@S3method geocode data.frame
 geocode.data.frame <- function(x, verbose=FALSE, service="google", addresscol="address", ...) {
-  latlon <- as.data.frame(t(sapply(x[[addresscol]],geocode,verbose=verbose,service=service)))
+  # Ignore any rows that have already been geocoded
+  already.geocoded <- "lat" %in% colnames(x) & "lon" %in% colnames(x)
+  if( already.geocoded ) {
+    sel <- is.na(x$lat) | is.na(x$lon)
+  } else{
+    sel <- rep(TRUE,nrow(x))
+  }
+  # Geocode
+  latlon <- as.data.frame(t(sapply(x[[addresscol]][sel],geocode,verbose=verbose,service=service)))
   colnames(latlon) <- c("lat","lon")
-  cbind( x, latlon )
+  # Return result
+  if(already.geocoded) {
+    x$lat[sel] <- latlon$lat
+    x$lon[sel] <- latlon$lon
+    return(x)
+  } else{
+    return( cbind( x, latlon ) )
+  }
 }
 
 #'Geocode using Google Maps API (deprecated)
