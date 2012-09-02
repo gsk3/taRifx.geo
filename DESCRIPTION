@@ -7,7 +7,7 @@ Author: Ari B. Friedman
 Maintainer: Ari B. Friedman <abfriedman@gmail.com>
 Description: A collection of miscellaneous spatial object manipulation functions
 License: GPL (>= 2)
-LazyLoad: yes
+LazyLoad: no
 Suggests:
     gdata,
     fields,
@@ -31,3 +31,4 @@ Depends:
 Collate:
     'Contributed.R'
     'R-GIS.R'
+    'data.R'
