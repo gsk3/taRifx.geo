@@ -502,3 +502,53 @@ SPDFtoPointsDF <- function(SPDF) {
 	colnames(coords) <- c("x","y")
 	return(cbind(SPDF@data,coords))
 }
+
+#' Get polygon IDs
+#' @aliases IDs IDs.default IDs.SpatialPolygonsDataFrame
+#' @param x The object to get the IDs from
+#' @param \dots Pass-alongs
+#' @rdname IDs
+IDs <- function(x,...) {
+  UseMethod("IDs",x)
+}
+#' @method IDs default
+#' @S3method IDs default
+#' @rdname IDs
+IDs.default <- function(x,...) {
+  stop("Currently only SpatialPolygonsDataFrames are supported.")
+}
+#' @method IDs SpatialPolygonsDataFrame
+#' @S3method IDs SpatialPolygonsDataFrame
+#' @rdname IDs
+IDs.SpatialPolygonsDataFrame <- function(x,...) {
+  vapply(slot(st1, "polygons"), function(x) slot(x, "ID"), "")
+}
+#! THis needs to work
+`IDs.SpatialPolygonsDataFrame<-` <- function(x,...) {
+  spChFIDs()
+}
+
+#' rbind SpatialPolygonsDataFrames together, fixing IDs if duplicated
+#' @param \dots SpatialPolygonsDataFrame(s) to rbind together
+#' @param fix.duplicated.IDs Whether to de-duplicate polygon IDs or not
+#' @return SpatialPolygonsDataFrame
+#' @author Ari B. Friedman, with key functionality by csfowler on StackExchange
+#' @method rbind.SpatialPolygonsDataFrame
+#' @export rbind.SpatialPolygonsDataFrame
+rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
+    dots = list(...)
+    names(dots) <- NULL
+    # Check IDs for duplicates and fix if indicated
+    IDs.list <- lapply(dots,IDs)
+    if( any(duplicated(unlist(IDs.list))) ) {
+      if(fix.duplicated.IDs) {
+        
+      } else {
+        stop("There are duplicated IDs, and fix.duplicated.IDs is not TRUE.")
+      }
+    }
+    # One call to bind them all
+    pl = do.call("rbind", lapply(dots, function(x) as(x, "SpatialPolygons")))
+    df = do.call("rbind", lapply(dots, function(x) x@data))
+    SpatialPolygonsDataFrame(pl, df)
+}
