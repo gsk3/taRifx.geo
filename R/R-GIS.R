@@ -284,8 +284,20 @@ countPointsInPolys = function(points,polys,density=FALSE,by=NULL) {
   SpatialPolygonsDataFrame(polygons(polys),data=DF,match.ID=TRUE)
 }
 
-
-
+#'Count polygons within other polygons
+#'
+#'Overlays polygons on other polygons and create a new polygon dataset with the count
+#'of the points in that polygon
+#'
+#'
+#'@param polys1 SpatialPolygonsDataFrame
+#'@param polys2 SpatialPolygonsDataFrame
+#'@return SpatialPolygonsDataFrame
+#'@seealso See Also as \code{\link[sp]{overlay}}
+#'@export countPolysInPolys
+countPolysInPolys = function(points,polys,density=FALSE,by=NULL) {
+  
+}
 
 #'Reshape a spatialLinesDataFrame into a series of points with associated
 #'information
@@ -530,13 +542,13 @@ IDs.SpatialPolygonsDataFrame <- function(x,...) {
 #' @param x The object to assign to
 #' @param value The character vector to assign to the IDs
 #' @author Ari B. Friedman
-#' @rdname IDs<-
+#' @rdname IDs
 "IDs<-" <- function( x, value ) {
   UseMethod("IDs<-",x)
 }
 #' @method IDs<- SpatialPolygonsDataFrame
 #' @S3method IDs<- SpatialPolygonsDataFrame
-#' @rdname IDs<-
+#' @rdname IDs
 "IDs<-.SpatialPolygonsDataFrame" <- function( x, value) {
   spChFIDs(x,value)
 }
@@ -569,9 +581,33 @@ rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
     } else {
       stop("There are duplicated IDs, and fix.duplicated.IDs is not TRUE.")
     }
+  } else { # Confirm that IDs match associated data.frame rownames
+    broken_IDs <- vapply( dots, function(x) all(IDs(x)!=rownames(x@data)), FALSE )
+    if( any(broken_IDs) ) {
+      for( i in which(broken_IDs) ) {
+        rownames( dots[[i]]@data ) <- IDs(dots[[i]])
+      }
+    }
   }
   # One call to bind them all
   pl = do.call("rbind", lapply(dots, function(x) as(x, "SpatialPolygons")))
   df = do.call("rbind", lapply(dots, function(x) x@data))
   SpatialPolygonsDataFrame(pl, df)
 }
+
+#' Merge a SpatialPolygonsDataFrame with a data.frame
+#' @param SPDF A SpatialPolygonsDataFrame
+#' @param df A data.frame
+#' @param \dots Parameters to pass to merge.data.frame
+#' 
+#' @export
+#' @docType methods
+#' @rdname merge-methods
+setGeneric("merge", function(SPDF, df, ...){
+  standardGeneric("merge")
+})
+#' @rdname merge-methods
+#' @aliases merge,SpatialPolygonsDataFrame,data.frame-method
+setMethod("merge",c("SpatialPolygonsDataFrame","data.frame"), function(SPDF,df,...) {
+  
+})
