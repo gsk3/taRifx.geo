@@ -608,6 +608,19 @@ setGeneric("merge", function(SPDF, df, ...){
 })
 #' @rdname merge-methods
 #' @aliases merge,SpatialPolygonsDataFrame,data.frame-method
-setMethod("merge",c("SpatialPolygonsDataFrame","data.frame"), function(SPDF,df,...) {
-  
+setMethod(
+  f="merge",
+  signature=c("SpatialPolygonsDataFrame","data.frame"), 
+  definition=function(SPDF,df,...) {
+    nrowBefore <- nrow(SPDF@data)
+    SPDF$.rowNames <- rownames(SPDF@data)
+    SPDF$.sortOrder <- seq(nrow(SPDF))
+    newDF <- merge.data.frame( SPDF@data, df, all.x=TRUE, sort=FALSE, ... )
+    nrowAfter <- nrow(newDF)
+    stopifnot(nrowBefore==nrowAfter)
+    SPDF@data <- newDF
+    SPDF@data <- SPDF@data[ order(SPDF$.sortOrder), ]
+    rownames(SPDF@data) <- SPDF$.rowNames
+    SPDF@data <- SPDF@data[, !colnames(SPDF@data) %in% c(".rowNames",".sortOrder")  ]
+    return(SPDF)
 })
