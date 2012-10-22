@@ -603,24 +603,24 @@ rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
 #' @export
 #' @docType methods
 #' @rdname merge-methods
-setGeneric("merge", function(SPDF, df, ...){
+setGeneric("merge", function(x, y, ...){
   standardGeneric("merge")
-})
+}, useAsDefault=base::merge)
 #' @rdname merge-methods
 #' @aliases merge,SpatialPolygonsDataFrame,data.frame-method
 setMethod(
   f="merge",
   signature=c("SpatialPolygonsDataFrame","data.frame"), 
-  definition=function(SPDF,df,...) {
-    nrowBefore <- nrow(SPDF@data)
-    SPDF$.rowNames <- rownames(SPDF@data)
-    SPDF$.sortOrder <- seq(nrow(SPDF))
-    newDF <- merge.data.frame( SPDF@data, df, all.x=TRUE, sort=FALSE, ... )
+  definition=function(x,y,...) {
+    nrowBefore <- nrow(x@data)
+    x$.rowNames <- rownames(x@data)
+    x$.sortOrder <- seq(nrow(x))
+    newDF <- merge.data.frame( x@data, y, all.x=TRUE, all.y=FALSE, sort=FALSE, ... )
     nrowAfter <- nrow(newDF)
     stopifnot(nrowBefore==nrowAfter)
-    SPDF@data <- newDF
-    SPDF@data <- SPDF@data[ order(SPDF$.sortOrder), ]
-    rownames(SPDF@data) <- SPDF$.rowNames
-    SPDF@data <- SPDF@data[, !colnames(SPDF@data) %in% c(".rowNames",".sortOrder")  ]
-    return(SPDF)
+    x@data <- newDF
+    x@data <- x@data[ order(x$.sortOrder), ]
+    rownames(x@data) <- x$.rowNames
+    x@data <- x@data[, !colnames(x@data) %in% c(".rowNames",".sortOrder")  ]
+    return(x)
 })

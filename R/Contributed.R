@@ -99,7 +99,14 @@ geocode.data.frame <- function(x, verbose=FALSE, service="google", addresscol="a
     sel <- rep(TRUE,nrow(x))
   }
   # Geocode
-  latlon <- as.data.frame(t(sapply(x[[addresscol]][sel],geocode,verbose=verbose,service=service)))
+  gcRobust <- function(a) {
+    res <- try(geocode(a,verbose=verbose,service=service))
+    if(class(res)=="try-error") res <- c(NA,NA)
+    res
+  }
+  latlon <- t(sapply(x[[addresscol]][sel],gcRobust ))
+  rownames(latlon) <- NULL
+  latlonDF <- as.data.frame(latlon)
   colnames(latlon) <- c("lat","lon")
   # Return result
   if(already.geocoded) {
