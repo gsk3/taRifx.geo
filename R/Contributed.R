@@ -107,14 +107,14 @@ geocode.data.frame <- function(x, verbose=FALSE, service="google", addresscol="a
   latlon <- t(sapply(x[[addresscol]][sel],gcRobust ))
   rownames(latlon) <- NULL
   latlonDF <- as.data.frame(latlon)
-  colnames(latlon) <- c("lat","lon")
+  colnames(latlonDF) <- c("lat","lon")
   # Return result
   if(already.geocoded) {
-    x$lat[sel] <- latlon$lat
-    x$lon[sel] <- latlon$lon
+    x$lat[sel] <- latlonDF$lat
+    x$lon[sel] <- latlonDF$lon
     return(x)
   } else{
-    return( cbind( x, latlon ) )
+    return( cbind( x, latlonDF ) )
   }
 }
 

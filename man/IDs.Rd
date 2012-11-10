@@ -2,7 +2,6 @@
 \alias{IDs}
 \alias{IDs.SpatialPolygonsDataFrame}
 \alias{IDs.default}
-\alias{IDs.default<-}
 \alias{IDs<-}
 \alias{IDs<-.SpatialPolygonsDataFrame}
 \title{Get sp feature IDs}

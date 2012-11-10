@@ -233,8 +233,6 @@ SPDFareas = function(SPDF,colname="AREA") {
 #'
 #'Overlays points on polygons and create a new polygon dataset with the count
 #'of the points in that polygon
-#'
-#'
 #'@param points SpatialPoints
 #'@param polys SpatialPolygonsDataFrame
 #'@param density Return a density (point count divided by area) instead of a
@@ -282,21 +280,6 @@ countPointsInPolys = function(points,polys,density=FALSE,by=NULL) {
     x
   } )
   SpatialPolygonsDataFrame(polygons(polys),data=DF,match.ID=TRUE)
-}
-
-#'Count polygons within other polygons
-#'
-#'Overlays polygons on other polygons and create a new polygon dataset with the count
-#'of the points in that polygon
-#'
-#'
-#'@param polys1 SpatialPolygonsDataFrame
-#'@param polys2 SpatialPolygonsDataFrame
-#'@return SpatialPolygonsDataFrame
-#'@seealso See Also as \code{\link[sp]{overlay}}
-#'@export countPolysInPolys
-countPolysInPolys = function(points,polys,density=FALSE,by=NULL) {
-  
 }
 
 #'Reshape a spatialLinesDataFrame into a series of points with associated
@@ -538,7 +521,7 @@ IDs.SpatialPolygonsDataFrame <- function(x,...) {
 }
 
 #' Assign sp feature IDs
-#' @aliases IDs<- IDs.default<-
+#' @aliases IDs<- IDs<-.SpatialPolygonsDataFrame
 #' @param x The object to assign to
 #' @param value The character vector to assign to the IDs
 #' @author Ari B. Friedman
@@ -558,7 +541,8 @@ IDs.SpatialPolygonsDataFrame <- function(x,...) {
 #' @param fix.duplicated.IDs Whether to de-duplicate polygon IDs or not
 #' @return SpatialPolygonsDataFrame
 #' @author Ari B. Friedman, with key functionality by csfowler on StackExchange
-#' @method rbind.SpatialPolygonsDataFrame
+#' @method rbind SpatialPolygonsDataFrame
+#' @S3method rbind SpatialPolygonsDataFrame
 #' @export rbind.SpatialPolygonsDataFrame
 rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
   dots <- as.list(substitute(list(...)))[-1L]

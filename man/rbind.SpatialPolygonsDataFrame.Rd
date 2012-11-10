@@ -2,7 +2,7 @@
 \alias{rbind.SpatialPolygonsDataFrame}
 \title{rbind SpatialPolygonsDataFrames together, fixing IDs if duplicated}
 \usage{
-  \method{rbind.SpatialPolygonsDataFrame}{} (...,
+  \method{rbind}{SpatialPolygonsDataFrame} (...,
     fix.duplicated.IDs = TRUE)
 }
 \arguments{
