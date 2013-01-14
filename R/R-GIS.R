@@ -665,5 +665,5 @@ clipToExtent <- function( sp, extent ) {
   require(rgeos)
   keep <- gContains( extent, sp,byid=TRUE ) | gOverlaps( extent, sp,byid=TRUE )
   stopifnot( ncol(keep)==1 )
-  sp[keep]
+  sp[drop(keep),]
 }
