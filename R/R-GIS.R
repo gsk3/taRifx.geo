@@ -391,9 +391,8 @@ interpolatePathpoints = function(pathpoints,dens,tolerance.min=1.2,tolerance.max
 
 
 
-#'Standardize latitude/longitude coordinates
-#'
-#'
+#' Standardize latitude/longitude coordinates
+#' Cleans up character representations of lat/lon coordinates
 #'@param vec Character vector of lat/long coordinates
 #'@return Numeric decimal lat/lon
 #'@export cleanLatLon
@@ -439,10 +438,7 @@ cumDist = function(coords) {
 
 
 #'Line distance in SpatialLinesDataFrame
-#'
 #'Stores length of each line segment in a SpatialLinesDataFrame's data.frame
-#'
-#'
 #'@param SLDF SpatialLinesDataFrame
 #'@param varname Character string containing name of variable to hold line
 #'distances.
@@ -461,8 +457,6 @@ lineDist = function(SLDF, varname="distances") {
 
 
 #'Create all pairwise distances of points from a SpatialPointsDataFrame
-#'
-#'
 #'@param SPDF SpatialPointsDataFrame
 #'@param names variable name in the SPDF's dataframe used to label each point
 #'in the resulting matrix
@@ -487,8 +481,6 @@ pointDistPairwise = function(SPDF, names = "name") {
 
 #'Convert SpatialPointsDataFrame to a regular data.frame with the coordinates
 #'as "x" and "y"
-#'
-#'
 #'@param SPDF SpatialPointsDataFrame
 #'@return data.frame with the coordinates as "x" and "y"
 #'@export SPDFtoPointsDF
@@ -499,8 +491,9 @@ SPDFtoPointsDF <- function(SPDF) {
 }
 
 #' Get sp feature IDs
-#' @aliases IDs IDs.default IDs.SpatialPolygonsDataFrame
-#' @param x The object to get the IDs from
+#' @aliases IDs IDs.default IDs.SpatialPolygonsDataFrame IDs<- IDs<-.SpatialPolygonsDataFrame
+#' @param x The object to get the IDs from or assign to
+#' @param value The character vector to assign to the IDs
 #' @param \dots Pass-alongs
 #' @author Ari B. Friedman
 #' @rdname IDs
@@ -521,17 +514,15 @@ IDs.SpatialPolygonsDataFrame <- function(x,...) {
 }
 
 #' Assign sp feature IDs
-#' @aliases IDs<- IDs<-.SpatialPolygonsDataFrame
-#' @param x The object to assign to
-#' @param value The character vector to assign to the IDs
-#' @author Ari B. Friedman
 #' @rdname IDs
+#' @usage IDs(x) <- value
 "IDs<-" <- function( x, value ) {
   UseMethod("IDs<-",x)
 }
 #' @method IDs<- SpatialPolygonsDataFrame
 #' @S3method IDs<- SpatialPolygonsDataFrame
 #' @rdname IDs
+#' @usage IDs(x) <- value
 "IDs<-.SpatialPolygonsDataFrame" <- function( x, value) {
   spChFIDs(x,value)
 }
@@ -608,3 +599,58 @@ setMethod(
     x@data <- x@data[, !colnames(x@data) %in% c(".rowNames",".sortOrder")  ]
     return(x)
 })
+
+
+
+#' Convert a bounding box to a SpatialPolygons object
+#' Bounding box is first created (in lat/lon) then projected if specified
+#' @param bbox Bounding box: a 2x2 numerical matrix of lat/lon coordinates (rownames must be c('lat','lon') and colnames must be c('min','max'))
+#' @param proj4stringFrom Projection string for the current bbox coordinates (defaults to lat/lon, WGS84)
+#' @param proj4stringTo Projection string, or NULL to not project
+#' @seealso \code{\link{clipToExtent}} which uses the output of this to clip to a bounding box
+#' @return A SpatialPolygons object of the bounding box
+#' @example 
+#' bb <- matrix(c(3,2,5,4),nrow=2)
+#' rownames(bb) <- c("lon","lat")
+#' colnames(bb) <- c('min','max')
+as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=CRS("+proj=longlat +datum=WGS84"), proj4stringTo=NULL ) {
+  # Create unprojected bbox as spatial object
+  bboxMat <- rbind( c(bb['lon','min'],bb['lat','min']), c(bb['lon','min'],bb['lat','max']), c(bb['lon','max'],bb['lat','max']), c(bb['lon','max'],bb['lat','min']), c(bb['lon','min'],bb['lat','min']) ) # clockwise, 5 points to close it
+  bboxSP <- SpatialPolygons( list(Polygons(list(Polygon(bboxMat)),"bbox")), proj4string=proj4stringFrom  )
+  if(!is.null(proj4stringTo)) {
+    bboxSP <- spTransform( bboxSP, proj4stringTo )
+  }
+  bboxSP
+}
+
+#' Restrict to extent of a polygon
+#' Currently does the sloppy thing and returns any object that has any area inside the extent polygon
+#' @param sp Spatial object
+#' @param extent a SpatialPolygons object - any part of sp not within a polygon will be discarded
+#' @seealso \code{\link{as.SpatialPolygons.bbox}} to create a SP from a bbox
+#' @return A spatial object of the same type
+#' @example
+#' set.seed(1)
+#' P4S.latlon <- CRS("+proj=longlat +datum=WGS84")
+#' ply <- SpatialPolygons(list(Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")), proj4string=P4S.latlon)
+#' pnt <- SpatialPoints( matrix(rnorm(100),ncol=2)+2, proj4string=P4S.latlon )
+#' # Make bounding box as Spatial Polygon
+#' bb <- matrix(c(3,2,5,4),nrow=2)
+#' rownames(bb) <- c("lon","lat")
+#' colnames(bb) <- c('min','max')
+#' bbSP <- as.SpatialPolygons.bbox(bb, proj4stringTo=P4S.latlon )
+#' # Clip to extent
+#' plyClip <- clipToExtent( ply, bbSP )
+#' pntClip <- clipToExtent( pnt, bbSP )
+#' # Plot
+#' plot( ply )
+#' plot( pnt, add=TRUE )
+#' plot( bbSP, add=TRUE, border="blue" )
+#' plot( plyClip, add=TRUE, border="red")
+#' plot( pntClip, add=TRUE, col="red", pch="o")
+clipToExtent <- function( sp, extent ) {
+  require(rgeos)
+  keep <- gContains( extent, sp,byid=TRUE ) | gOverlaps( extent, sp,byid=TRUE )
+  stopifnot( ncol(keep)==1 )
+  sp[keep]
+}
