@@ -607,15 +607,28 @@ setMethod(
 #' @param bbox Bounding box: a 2x2 numerical matrix of lat/lon coordinates (rownames must be c('lat','lon') and colnames must be c('min','max'))
 #' @param proj4stringFrom Projection string for the current bbox coordinates (defaults to lat/lon, WGS84)
 #' @param proj4stringTo Projection string, or NULL to not project
+#' @param interpolate If nonzero, the number of nodes per side to add in (helps maintain coverage if you're projecting)
 #' @seealso \code{\link{clipToExtent}} which uses the output of this to clip to a bounding box
 #' @return A SpatialPolygons object of the bounding box
 #' @example 
 #' bb <- matrix(c(3,2,5,4),nrow=2)
 #' rownames(bb) <- c("lon","lat")
 #' colnames(bb) <- c('min','max')
-as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=CRS("+proj=longlat +datum=WGS84"), proj4stringTo=NULL ) {
+#' as.SpatialPolygons.bbox( bb )
+as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=CRS("+proj=longlat +datum=WGS84"), proj4stringTo=NULL, interpolate=0 ) {
   # Create unprojected bbox as spatial object
-  bboxMat <- rbind( c(bb['lon','min'],bb['lat','min']), c(bb['lon','min'],bb['lat','max']), c(bb['lon','max'],bb['lat','max']), c(bb['lon','max'],bb['lat','min']), c(bb['lon','min'],bb['lat','min']) ) # clockwise, 5 points to close it
+  bboxMat <- rbind( c(bbox['lon','min'],bbox['lat','min']), c(bbox['lon','min'],bbox['lat','max']), c(bbox['lon','max'],bbox['lat','max']), c(bbox['lon','max'],bbox['lat','min']), c(bbox['lon','min'],bbox['lat','min']) ) # clockwise, 5 points to close it
+  if( interpolate!=0 ) {
+    bboxOrig <- bboxMat
+    bboxMat <- matrix(NA, nrow=4*(interpolate-1)+1, ncol=2 )
+    for( r in seq(4)) {
+      s <- r*(interpolate-1)-interpolate+1 # start index for each iteration
+      newX <- seq( from=bboxOrig[r,1], to=bboxOrig[r+1,1], length.out=interpolate )
+      newY <- seq( from=bboxOrig[r,2], to=bboxOrig[r+1,2], length.out=interpolate )
+      bboxMat[seq(s+1,s+interpolate-1),] <- cbind( newX[seq(length(newX)-1)], newY[seq(length(newY)-1)] )
+    }
+    bboxMat[nrow(bboxMat),] <- bboxOrig[5,]
+  }
   bboxSP <- SpatialPolygons( list(Polygons(list(Polygon(bboxMat)),"bbox")), proj4string=proj4stringFrom  )
   if(!is.null(proj4stringTo)) {
     bboxSP <- spTransform( bboxSP, proj4stringTo )
