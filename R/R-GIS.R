@@ -667,3 +667,121 @@ clipToExtent <- function( sp, extent ) {
   stopifnot( ncol(keep)==1 )
   sp[drop(keep),]
 }
+
+
+#' Generic function to interpolate from a polygon to points lying inside it
+#' This function was designed to solve the following problem.  Suppose you have counts
+#' of the number of entities inside a polygon (N).  To compute distances to a point, you might
+#' take the distance from the polygon centroid.  But this is too simplistic--it discards the
+#' positional uncertainty inherent in not knowing the exact location of each entity which
+#' makes up the count.  Instead, we repeatedly sample N points from the census block group centroids 
+#' which lie within our polygon, weight them by their population, and compute distances from there.
+#' @param crude A SpatialPolygonsDataFrame containing the variable of interest
+#' @param fine an sp object whose points or polygons lie inside the polygons of crude
+#' @param FUN An function taking at least two arguments (a single polygon of crude in the first position, and the within-polygon elements of fine in the second)
+#' @param nSampleCol Column name in crude containing number of elements of fineWithin to sample per polygon
+#' @param samplesize The number of replicates per element of crude to draw
+#' @param simplify Whether to simplify to an array or not
+#' @param \dots Arguments to be passed to FUN
+#' @export 
+#' @return list of length length(crude) where each element is a list of length samplesize containing the results of FUN for that crude-element/sample
+#' @examples
+#' \dontrun{
+#' require(fields)
+#' require(rgdal)
+#' require(functional)
+#' distanceMatrix <- function( points1, points2, dist.fn=Curry(rdist.earth,miles=FALSE) ) {
+#'  cat( "Generating distance matrix for ",length(points1)," by ", length(points2), " matrix.\n" )
+#'  if(!is.na(proj4string(points1)))  points1 <- spTransform( points1, CRS("+proj=longlat +datum=WGS84") )
+#'  if(!is.na(proj4string(points2)))  points2 <- spTransform( points2, CRS("+proj=longlat +datum=WGS84") )
+#'  dist.fn( points1@coords, points2@coords )
+#' }
+#' # One option: Use the apply functionality
+#' dist <- interpolateAndApplyWithinSpatial( crude=polySP, fine=pointSP, FUN=distanceMatrix, nSampleCol="z", samplesize=25,  points2=pointSP2, simplify=TRUE )
+#' # Dist now is a list of 3 matrices, each with dimensions: N x length(pointSP2) x samplesize
+#' # Each matrix represents N entities imputed from a single polygon, so we can actually simplify further
+#' library(abind)
+#' distmat <- do.call( Curry(abind, along=1), dist )
+#' mindist <- apply( distmat, 3, function(x) { # For each realization of the 'world'
+#'   apply( x,  )
+#' } )
+#' } # end of dontrun
+interpolateAndApplyWithinSpatial <- function( crude, fine, FUN, nSampleCol, samplesize=30, simplify=FALSE, ... ) {
+  lapply( seq(length(crude)), function(i) {
+    crudeSingle <- crude[i,]
+    fineWithin <- fine[as.logical(!is.na(overlay( crudeSingle, fine ))),]
+    ellipsisList <- list(...)
+    ellipsisList$crudeSingle=crudeSingle;ellipsisList$fineWithin=fineWithin;ellipsisList$FUN=FUN;ellipsisList$nSampleCol=nSampleCol; ellipsisList$samplesize=samplesize
+    do.call( interpolateWithinSingleSpatial, ellipsisList )
+  })
+}
+#' Interpolate and sample within a single polygon
+#' (Called by interpolateWithinSpatial)
+#' @param crudeSingle A single polygon
+#' @param fineWithin A points or polygon sp object whose elements lie within crudeSingle
+#' @param FUN A function to be applied to them after sampling
+#' @param nSampleCol Column name containing number of elements of fineWithin to sample
+#' @param samplesize The number of replicates per element of crude to draw
+#' @param simplify Whether to simplify to an array or not
+#' @param \dots Arguments to FUN
+#' @return List of FUN's results for each sampling
+interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampleCol, samplesize, simplify=FALSE, ... ) {
+  if(length(fineWithin)<=0) {
+    return( NA )
+  } else {
+    stopifnot(length(crudeSingle)==1)
+    # First sample
+    n.sample <- crudeSingle[[nSampleCol]]
+      #! Add weights to the sampling
+    sampled <- replicate( samplesize, 
+      fineWithin[ sample( x=seq(length(fineWithin)), size=n.sample, replace=TRUE ), ], 
+      simplify=FALSE )
+    # Then apply FUN to each sampling
+    ellipsisList <- list(...)
+    ellipsisList$X=sampled; ellipsisList$FUN=FUN
+    simpfxn <- switch( as.integer(simplify)+1, identity, simplify2array )
+    return( simpfxn( do.call( lapply, ellipsisList ) ) )
+  }
+}
+
+#' Interpolate points from polygon SPDF
+#' This function returns a single (weighted) sample point in fine for every polygon in crude.
+#' Thus running it repeatedly gives you the variation you want.
+#' @param crude A SpatialPolygonsDataFrame.
+#' @param fine A SpatialPointsDataFrame.
+#' @param weightCol A column name in fine to weight the point sampling by, or NULL if no weighting is required
+#' @param nSampleCol Either a column name in crude containing number of elements of fineWithin to sample per polygon, or a number of points to sample per polygon
+#' @examples
+#' replicate( 100, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE ) )
+interpolatePolyPoint <- function( crude, fine, weightCol, nSampleCol=1, replace=FALSE ) {
+  if(class(crude)!="SpatialPolygonsDataFrame") stop("Crude must be a SpatialPolygonsDataFrame.\n")
+  if(class(fine)!="SpatialPointsDataFrame") stop("Fine must be a SpatialPointsDataFrame.\n")
+  if(class(weightCol)!="character" & !is.null(weightCol)) stop("weightCol must be a character object specifying the column name.\n")
+  if(class(nSampleCol)!="character" & class(nSampleCol)!="numeric") stop("nSampleCol must be either numeric or character.\n")
+  
+  res <- lapply( seq(length(crude)) , function(i) {
+    fineOver <- fine[ as.logical(!is.na(over( fine, crude[i,] ))), ]
+    sz <- ifelse( class(nSampleCol)=="character", crude[i,][[nSampleCol]], nSampleCol )
+    sampledIdx <- sample( seq(length(fineOver)), size=sz, replace=replace, prob=fineOver[[weightCol]] )
+    fineOver[sampledIdx,]
+  } )
+  do.call( rbind, res )
+}
+
+#' Split polygons into contiguous parts
+#' Overlay, in the sense described here: http://resources.esri.com/help/9.3/ArcGISengine/java/Gp_ToolRef/geoprocessing/overlay_analysis.htm
+#' @param poly1 SPDF
+#' @param poly2 SPDF
+#' @return A SPDF with nested polygons of each
+overlayPolyPoly <- function(poly1,poly2) {
+  pieces <- list()
+  pieces[["int"]] <- gIntersection(Parcels,Soils,byid=TRUE)
+  pieces[["diff1"]] <- gDifference(Parcels,Soils,byid=TRUE)
+  pieces[["diff2"]] <- gDifference(Soils,Parcels,byid=TRUE)
+  for( i in seq(length(poly1)) ) {
+    for( j in seq(length(poly2)) ) {
+      pieces[["diff1"]] <- gDifference(Parcels[i,],Soils[j,])
+      pieces[["diff2"]] <- gDifference(Soils[j,],Parcels[i,])
+    }
+  }
+}
