@@ -745,25 +745,35 @@ interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampl
 }
 
 #' Interpolate points from polygon SPDF
-#' This function returns a single (weighted) sample point in fine for every polygon in crude.
-#' Thus running it repeatedly gives you the variation you want.
+#' This function returns (weighted) sample points in fine for every polygon in crude.
+#' Thus running it repeatedly gives you useful variation that reflects the interpolation uncertainty.
 #' @param crude A SpatialPolygonsDataFrame.
 #' @param fine A SpatialPointsDataFrame.
 #' @param weightCol A column name in fine to weight the point sampling by, or NULL if no weighting is required
 #' @param nSampleCol Either a column name in crude containing number of elements of fineWithin to sample per polygon, or a number of points to sample per polygon
+#' @param replace A logical indicating whether to sample points from fine with replacement or not within each polygon of crude
+#' @return A SpatialPointsDataFrame containing 
 #' @examples
-#' replicate( 100, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE ) )
-interpolatePolyPoint <- function( crude, fine, weightCol, nSampleCol=1, replace=FALSE ) {
+#' replicate( 100, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE ), simplify=FALSE )
+interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, replace=TRUE ) {
   if(class(crude)!="SpatialPolygonsDataFrame") stop("Crude must be a SpatialPolygonsDataFrame.\n")
   if(class(fine)!="SpatialPointsDataFrame") stop("Fine must be a SpatialPointsDataFrame.\n")
-  if(class(weightCol)!="character" & !is.null(weightCol)) stop("weightCol must be a character object specifying the column name.\n")
+  if( class(weightCol)!="character" & !is.null(weightCol)) stop("weightCol must be a character object specifying the column name, or NULL if no weighting is required.\n")
   if(class(nSampleCol)!="character" & class(nSampleCol)!="numeric") stop("nSampleCol must be either numeric or character.\n")
   
   res <- lapply( seq(length(crude)) , function(i) {
     fineOver <- fine[ as.logical(!is.na(over( fine, crude[i,] ))), ]
     sz <- ifelse( class(nSampleCol)=="character", crude[i,][[nSampleCol]], nSampleCol )
-    sampledIdx <- sample( seq(length(fineOver)), size=sz, replace=replace, prob=fineOver[[weightCol]] )
-    fineOver[sampledIdx,]
+    if( class(weightCol)=="character") {
+      fineProb <- fineOver[[weightCol]]
+    } else {
+        fineProb <- rep( 1, length(fineOver) )
+    }
+    sampledIdx <- sample( seq(length(fineOver)), size=sz, replace=replace, prob=fineProb )
+    fineSamp <- fineOver[sampledIdx,]
+    fineSamp@data <- cbind( fineSamp@data, crude[i,]@data ) # Crude should only have one row, and hence will wrap if sz>1
+    fineSamp$crudePolygonId <- i
+    fineSamp
   } )
   do.call( rbind, res )
 }
