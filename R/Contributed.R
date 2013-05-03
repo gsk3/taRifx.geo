@@ -95,6 +95,7 @@ geocode.data.frame <- function(x, verbose=FALSE, service="google", addresscol="a
   already.geocoded <- "lat" %in% colnames(x) & "lon" %in% colnames(x)
   if( already.geocoded ) {
     sel <- is.na(x$lat) | is.na(x$lon)
+    cat("This data.frame has already been partially geocoded.  Geocoding",sum(sel),"out of",nrow(x),"addresses.\n")
   } else{
     sel <- rep(TRUE,nrow(x))
   }

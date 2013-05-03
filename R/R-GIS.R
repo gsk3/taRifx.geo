@@ -754,7 +754,7 @@ interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampl
 #' @param replace A logical indicating whether to sample points from fine with replacement or not within each polygon of crude
 #' @return A SpatialPointsDataFrame containing 
 #' @examples
-#' replicate( 100, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE ), simplify=FALSE )
+#' replicate( 10, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE ), simplify=FALSE )
 interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, replace=TRUE ) {
   if(class(crude)!="SpatialPolygonsDataFrame") stop("Crude must be a SpatialPolygonsDataFrame.\n")
   if(class(fine)!="SpatialPointsDataFrame") stop("Fine must be a SpatialPointsDataFrame.\n")
@@ -762,19 +762,35 @@ interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, rep
   if(class(nSampleCol)!="character" & class(nSampleCol)!="numeric") stop("nSampleCol must be either numeric or character.\n")
   
   res <- lapply( seq(length(crude)) , function(i) {
-    fineOver <- fine[ as.logical(!is.na(over( fine, crude[i,] ))), ]
-    sz <- ifelse( class(nSampleCol)=="character", crude[i,][[nSampleCol]], nSampleCol )
-    if( class(weightCol)=="character") {
-      fineProb <- fineOver[[weightCol]]
-    } else {
-        fineProb <- rep( 1, length(fineOver) )
+    crudeI <- crude[i,]
+    sz <- ifelse( class(nSampleCol)=="character", crudeI[[nSampleCol]], nSampleCol )
+    if(sz>0) {
+      # See if there's overlap (suppress the warnings that result if there isn't)
+      fineOver <- suppressWarnings(fine[ as.logical(!is.na(over( as(fine,"SpatialPoints"), as(crudeI,"SpatialPolygons") ))), ])
+      if(length(fineOver)==0) { # If there's no overlap just use a random point
+        fineOver <- spsample( crudeI, type="random", n=sz )
+        fineBlankRow <- fine@data[1,,drop=FALSE] # Make a blank data.frame so we've got the columns similar to the SPDFs where there was overlap
+        fineBlankRow[,] <- NA
+        fineSamp <- SpatialPointsDataFrame( fineOver, data=fineBlankRow[rep(1,sz),,drop=FALSE] )
+        fineSamp$imputationMethod <- "Random within crude polygon"
+      } else { # If there's overlap (as there should be for most points)
+        if( class(weightCol)=="character") {
+          fineProb <- fineOver[[weightCol]]
+        } else {
+            fineProb <- rep( 1, length(fineOver) )
+        }
+        sampledIdx <- sample( seq(length(fineOver)), size=sz, replace=replace, prob=fineProb )
+        fineSamp <- fineOver[sampledIdx,]
+        fineSamp$imputationMethod <- "Sampling fine points"
+      }
+      fineSamp@data <- cbind( fineSamp@data, crudeI@data ) # Crude should only have one row, and hence will wrap if sz>1
+      fineSamp$crudePolygonId <- i
+    } else { # If sz==0
+      fineSamp <- NULL
     }
-    sampledIdx <- sample( seq(length(fineOver)), size=sz, replace=replace, prob=fineProb )
-    fineSamp <- fineOver[sampledIdx,]
-    fineSamp@data <- cbind( fineSamp@data, crude[i,]@data ) # Crude should only have one row, and hence will wrap if sz>1
-    fineSamp$crudePolygonId <- i
     fineSamp
   } )
+  res <- res[!vapply( res, FUN=is.null, FUN.VALUE=FALSE )]
   do.call( rbind, res )
 }
 
