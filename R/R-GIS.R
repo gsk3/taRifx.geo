@@ -752,23 +752,31 @@ interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampl
 #' @param weightCol A column name in fine to weight the point sampling by, or NULL if no weighting is required
 #' @param nSampleCol Either a column name in crude containing number of elements of fineWithin to sample per polygon, or a number of points to sample per polygon
 #' @param replace A logical indicating whether to sample points from fine with replacement or not within each polygon of crude
+#' @param verbose Whether to output detailed error messages
 #' @return A SpatialPointsDataFrame containing 
 #' @examples
-#' replicate( 10, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE ), simplify=FALSE )
-interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, replace=TRUE ) {
+#' replicate( 10, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE, verbose=TRUE ), simplify=FALSE )
+interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, replace=TRUE, verbose=FALSE ) {
   if(class(crude)!="SpatialPolygonsDataFrame") stop("Crude must be a SpatialPolygonsDataFrame.\n")
   if(class(fine)!="SpatialPointsDataFrame") stop("Fine must be a SpatialPointsDataFrame.\n")
   if( class(weightCol)!="character" & !is.null(weightCol)) stop("weightCol must be a character object specifying the column name, or NULL if no weighting is required.\n")
   if(class(nSampleCol)!="character" & class(nSampleCol)!="numeric") stop("nSampleCol must be either numeric or character.\n")
   
-  res <- lapply( seq(length(crude)) , function(i) {
-    crudeI <- crude[i,]
-    sz <- ifelse( class(nSampleCol)=="character", crudeI[[nSampleCol]], nSampleCol )
+  if( class(nSampleCol)=="character" ) nSample <- crude[[nSampleCol]] else nSample <- nSampleCol
+  
+  interpolateOne <- function(i) {
+    crudeI <- crude[i,] # Uses non-local scope
+    sz <- nSample[i]
     if(sz>0) {
       # See if there's overlap (suppress the warnings that result if there isn't)
       fineOver <- suppressWarnings(fine[ as.logical(!is.na(over( as(fine,"SpatialPoints"), as(crudeI,"SpatialPolygons") ))), ])
-      if(length(fineOver)==0) { # If there's no overlap just use a random point
-        fineOver <- spsample( crudeI, type="random", n=sz )
+      if(length(fineOver)==0) { # If there's no overlap just use spatially random points
+        if(verbose) cat("No overlap for point",i,". Using random point instead.\n")
+        fineOver <- try( spsample( crudeI, type="random", n=sz ) )
+        if( class(fineOver)=="try-error" ) {
+          if(verbose) cat("Random point sampling failed to converge.  Using centroid instead.\n")
+          fineOver <- gCentroid(crudeI)
+        }
         fineBlankRow <- fine@data[1,,drop=FALSE] # Make a blank data.frame so we've got the columns similar to the SPDFs where there was overlap
         fineBlankRow[,] <- NA
         fineSamp <- SpatialPointsDataFrame( fineOver, data=fineBlankRow[rep(1,sz),,drop=FALSE] )
@@ -777,7 +785,7 @@ interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, rep
         if( class(weightCol)=="character") {
           fineProb <- fineOver[[weightCol]]
         } else {
-            fineProb <- rep( 1, length(fineOver) )
+          fineProb <- rep( 1, length(fineOver) )
         }
         sampledIdx <- sample( seq(length(fineOver)), size=sz, replace=replace, prob=fineProb )
         fineSamp <- fineOver[sampledIdx,]
@@ -789,9 +797,18 @@ interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, rep
       fineSamp <- NULL
     }
     fineSamp
-  } )
-  res <- res[!vapply( res, FUN=is.null, FUN.VALUE=FALSE )]
-  do.call( rbind, res )
+  } 
+  
+  startIdx <- which(nSample!=0)[1]
+  res <- interpolateOne(startIdx)
+  if(length(crude)>startIdx) {
+    for( i in seq(startIdx+1,length(crude)) ) {
+      if(verbose && (i%%10)==0) cat("Processing polygon",i,"\n")
+      tempRes <- interpolateOne(i)
+      if(!is.null(tempRes)) res <- rbind( res, tempRes )
+    }
+  }
+  res
 }
 
 #' Split polygons into contiguous parts
