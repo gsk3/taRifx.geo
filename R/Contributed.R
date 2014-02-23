@@ -8,9 +8,9 @@
 #'@aliases geocode geocode.default geocode.data.frame
 #'@param x A vector or data.frame
 #'@param verbose Whether to display each address as it is submitted to Google or not
-#'@param addresscol A (character) name of the column in a data.frame which contains the addresses
 #'@param service API to use.  Current options are "bing" or "google"
 #'@param return What to return.  Options include "coordinates" and "zip".
+#'@param addresscol A (character) name of the column in a data.frame which contains the addresses
 #'@param \dots Other items to pass along
 #'@return geocode.default returns a numeric vector of length 2 containing the
 #'latitudes and longitudes. geocode.data.frame returns the original data.frame
@@ -97,7 +97,7 @@ geocode.default <- function(x,verbose=FALSE, service="google", return="coordinat
       res$coordinates <- crds
     }
     if( "zip" %in% return )  {
-      res$zip <- str_extract( j$resourceSets[[1]]$resources[[1]]$address$formattedAddress, "\\d{5}$-?\\d?\\d?\\d?\\d?" )
+      res$zip <- sub( "^.*(\\d{5}-?\\d?\\d?\\d?\\d?).*$", "\\1", j$resourceSets[[1]]$resources[[1]]$address$formattedAddress )
     }
     return( res )
   }
@@ -109,7 +109,7 @@ geocode.default <- function(x,verbose=FALSE, service="google", return="coordinat
 #'@rdname geocode
 #'@method geocode data.frame
 #'@S3method geocode data.frame
-geocode.data.frame <- function(x, verbose=FALSE, service="google", addresscol="address", return="coordinates", ...) {
+geocode.data.frame <- function(x, verbose=FALSE, service="google", return="coordinates", addresscol="address", ... ) {
   if("zip" %in% return )  stop("data.frame geocoding only supports coordinates return type")
   # Ignore any rows that have already been geocoded
   already.geocoded <- "lat" %in% colnames(x) & "lon" %in% colnames(x)
