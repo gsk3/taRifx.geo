@@ -155,7 +155,7 @@ gGeoCode <- function(...) {
 #'@aliases georoute georoute.default
 #'@param x A character vector of length>=2, where each element is a (starting, ending, or intermediate) waypoint, or a numeric matrix with columns c('lat','lon') where each row is a waypoint
 #'@param verbose Provide additional information
-#'@param returntype What information to return.  Currently, the options are "all", "distance", "path", or "time"
+#'@param returntype What information to return.  Currently, the options are "all", "distance", "distanceUnit", "path", "time", and/or "timeUnit".  Can be combined, as in returntype=c("time","distance").
 #'@param service API to use.  Currently the only option is "bing"
 #'@param \dots Other items to pass along
 #'@return Route information (see the returntype argument)
@@ -169,7 +169,7 @@ gGeoCode <- function(...) {
 #'# Using lat/lon
 #'xmat <- rbind( geocode( "3817 Spruce St, Philadelphia, PA 19104" ), geocode( "9000 Rockville Pike, Bethesda, Maryland 20892" ) )
 #'colnames(xmat) <- c( 'lat', 'lon' )
-#'georoute( xmat, verbose=TRUE, returntype = "all" )
+#'georoute( xmat, verbose=TRUE, returntype = c("distance","distanceUnit") )
 #'}
 #'@rdname georoute
 #'@export georoute
@@ -189,6 +189,7 @@ georoute.default <- function( x, verbose=FALSE, service="bing", returntype="all"
   # URL constructing
   construct.georoute.url <- list()
   construct.georoute.url[["bing"]] <- function(waypoints, maxSolutions=1, optimize="time", distanceUnit="km",travelMode="Driving",path=(returntype=="path") ) { # documented at http://msdn.microsoft.com/en-us/library/ff701717
+    if( "data.frame" %in% class(waypoints) )  waypoints <- as.matrix(waypoints)
     if( class(waypoints) == "matrix" ) { # handle lat/lon cases by converting to character strings separated by commas (e.g. 42.5,-77 gets converted to "42.5,-77" for use in the URL)
       waypoints <- apply( waypoints, 1, paste0, collapse="," )
     }
@@ -212,12 +213,18 @@ georoute.default <- function( x, verbose=FALSE, service="bing", returntype="all"
     rt <- j$resourceSets[[1]]$resources[[1]]
     if(verbose) message(" - Confidence: ", rt$routeLegs[[1]]$startLocation$confidence,appendLF=FALSE)
     if(verbose) message(" - Distance unit: ", rt$distanceUnit, " Time unit:", rt$durationUnit ,appendLF=FALSE)
-    if(returntype=="all") return(rt$routeLegs[[1]])
-    if(returntype=="path") return( t(sapply(rt$routePath$line$coordinates, unlist)) )
-    if(returntype=="distance") return(rt$travelDistance)
-    if(returntype=="time") return(rt$travelDuration)
+    if( "all" %in% returntype ) {
+      res <- rt$routeLegs[[1]]
+    } else {
+      res <- list()
+      if( "path" %in% returntype ) res[[ "path" ]] <-  t(sapply(rt$routePath$line$coordinates, unlist))
+      if( "distance" %in% returntype ) res[[ "distance" ]] <-  rt$travelDistance
+      if( "distanceUnit" %in% returntype ) res[[ "distanceUnit" ]] <- rt$distanceUnit
+      if( "time" %in% returntype ) res[[ "time" ]] <- rt$travelDuration
+      if( "timeUnit" %in% returntype ) res[[ "timeUnit" ]] <- rt$durationUnit
+    }
+    res
   }
-  res <- parse.json[[service]](j)
   if(verbose) message("\n",appendLF=FALSE)
-  return( res )
+  return( parse.json[[service]](j) )
 }
