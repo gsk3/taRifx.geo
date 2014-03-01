@@ -1,9 +1,5 @@
 # Miscellaneous functions to do GIS-like manipulation of spatial objects
 
-# Ari Friedman
-# Version 1.0.4
-# 8/02/2012
-
 
 #'Cartesian distance between points
 #'
@@ -497,33 +493,32 @@ SPDFtoPointsDF <- function(SPDF) {
 #' @param \dots Pass-alongs
 #' @author Ari B. Friedman
 #' @rdname IDs
-IDs <- function(x,...) {
+IDs <- function( x, ... ) {
   UseMethod("IDs",x)
 }
 #' @method IDs default
 #' @S3method IDs default
 #' @rdname IDs
-IDs.default <- function(x,...) {
+IDs.default <- function( x, ... ) {
   stop("Currently only SpatialPolygonsDataFrames are supported.")
 }
 #' @method IDs SpatialPolygonsDataFrame
 #' @S3method IDs SpatialPolygonsDataFrame
 #' @rdname IDs
-IDs.SpatialPolygonsDataFrame <- function(x,...) {
+IDs.SpatialPolygonsDataFrame <- function( x, ... ) {
   vapply(slot(x, "polygons"), function(x) slot(x, "ID"), "")
 }
-
 #' Assign sp feature IDs
 #' @rdname IDs
 #' @usage IDs(x) <- value
-"IDs<-" <- function( x, value ) {
+`IDs<-` <- function( x, value ) {
   UseMethod("IDs<-",x)
 }
 #' @method IDs<- SpatialPolygonsDataFrame
 #' @S3method IDs<- SpatialPolygonsDataFrame
 #' @rdname IDs
 #' @usage IDs(x) <- value
-"IDs<-.SpatialPolygonsDataFrame" <- function( x, value) {
+`IDs<-.SpatialPolygonsDataFrame` <- function( x, value) {
   spChFIDs(x,value)
 }
 
@@ -818,13 +813,13 @@ interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, rep
 #' @return A SPDF with nested polygons of each
 overlayPolyPoly <- function(poly1,poly2) {
   pieces <- list()
-  pieces[["int"]] <- gIntersection(Parcels,Soils,byid=TRUE)
-  pieces[["diff1"]] <- gDifference(Parcels,Soils,byid=TRUE)
-  pieces[["diff2"]] <- gDifference(Soils,Parcels,byid=TRUE)
+  pieces[["int"]] <- gIntersection(poly1,poly2,byid=TRUE)
+  pieces[["diff1"]] <- gDifference(poly1,poly2,byid=TRUE)
+  pieces[["diff2"]] <- gDifference(poly2,poly1,byid=TRUE)
   for( i in seq(length(poly1)) ) {
     for( j in seq(length(poly2)) ) {
-      pieces[["diff1"]] <- gDifference(Parcels[i,],Soils[j,])
-      pieces[["diff2"]] <- gDifference(Soils[j,],Parcels[i,])
+      pieces[["diff1"]] <- gDifference(poly1[i,],poly2[j,])
+      pieces[["diff2"]] <- gDifference(poly2[j,],poly1[i,])
     }
   }
 }

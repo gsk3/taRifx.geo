@@ -9,7 +9,7 @@
 #'@param x A vector or data.frame
 #'@param verbose Whether to display each address as it is submitted to Google or not
 #'@param service API to use.  Current options are "bing" or "google"
-#'@param return What to return.  Options include "coordinates" and "zip".
+#'@param returntype What to return.  Options include "coordinates" and "zip".
 #'@param addresscol A (character) name of the column in a data.frame which contains the addresses
 #'@param \dots Other items to pass along
 #'@return geocode.default returns a numeric vector of length 2 containing the
@@ -26,7 +26,7 @@
 #'}
 #'@rdname geocode
 #'@export geocode
-geocode <- function( x, verbose=FALSE, service="google", return="coordinates", ... ) {
+geocode <- function( x, verbose=FALSE, service="google", returntype="coordinates", ... ) {
   require(RCurl)
   require(RJSONIO)
   UseMethod("geocode",x)
@@ -34,7 +34,7 @@ geocode <- function( x, verbose=FALSE, service="google", return="coordinates", .
 #'@rdname geocode
 #'@method geocode default
 #'@S3method geocode default
-geocode.default <- function(x,verbose=FALSE, service="google", return="coordinates", ...) {
+geocode.default <- function(x,verbose=FALSE, service="google", returntype="coordinates", ...) {
   if(x=="") return(c(NA,NA))
   # Input regularization and checking
   service <- tolower(service)
@@ -61,12 +61,12 @@ geocode.default <- function(x,verbose=FALSE, service="google", return="coordinat
   parse.json[["google"]] <- function(j) {
     if(j$status=="OK") {
       res <- list()
-      if( "coordinates" %in% return ) {
+      if( "coordinates" %in% returntype ) {
         lat <- j$results[[1]]$geometry$location$lat
         lng <- j$results[[1]]$geometry$location$lng
         res$coordinates <- c(lat, lng)
       }
-      if( "zip" %in% return )  {
+      if( "zip" %in% returntype )  {
         zp <- j$results[[1]]$address_components[[8]]$short_name
         if( j$results[[1]]$address_components[[8]]$types[[1]] != "postal_code" )  warning(paste("Not sure these zips are actually zips.  Type:", j$results[[1]]$address_components[[8]]$types[[1]]) )
         res$zip <- zp
@@ -92,25 +92,25 @@ geocode.default <- function(x,verbose=FALSE, service="google", return="coordinat
     }
     if(verbose) message(" - Confidence: ", j$resourceSets[[1]]$resources[[1]]$confidence ,appendLF=FALSE)
     res <- list()
-    if( "coordinates" %in% return ) {
+    if( "coordinates" %in% returntype ) {
       crds <- unlist(j$resourceSets[[1]]$resources[[1]]$point$coordinates)
       res$coordinates <- crds
     }
-    if( "zip" %in% return )  {
+    if( "zip" %in% returntype )  {
       res$zip <- sub( "^.*(\\d{5}-?\\d?\\d?\\d?\\d?).*$", "\\1", j$resourceSets[[1]]$resources[[1]]$address$formattedAddress )
     }
     return( res )
   }
   res <- parse.json[[service]](j)
-  if(length(return)==1) res <- res[[1]]
+  if(length(returntype)==1) res <- res[[1]]
   if(verbose) message("\n",appendLF=FALSE)
   return( res )
 }
 #'@rdname geocode
 #'@method geocode data.frame
 #'@S3method geocode data.frame
-geocode.data.frame <- function(x, verbose=FALSE, service="google", return="coordinates", addresscol="address", ... ) {
-  if("zip" %in% return )  stop("data.frame geocoding only supports coordinates return type")
+geocode.data.frame <- function(x, verbose=FALSE, service="google", returntype="coordinates", addresscol="address", ... ) {
+  if("zip" %in% returntype )  stop("data.frame geocoding only supports coordinates return type")
   # Ignore any rows that have already been geocoded
   already.geocoded <- "lat" %in% colnames(x) & "lon" %in% colnames(x)
   if( already.geocoded ) {
