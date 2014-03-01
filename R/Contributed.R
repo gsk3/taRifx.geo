@@ -153,7 +153,7 @@ gGeoCode <- function(...) {
 #'Find transit routes using Google or Bing's API
 #'
 #'@aliases georoute georoute.default
-#'@param x A character vector of length>=2, where each element is a (starting, ending, or intermediate) waypoint
+#'@param x A character vector of length>=2, where each element is a (starting, ending, or intermediate) waypoint, or a numeric matrix with columns c('lat','lon') where each row is a waypoint
 #'@param verbose Provide additional information
 #'@param returntype What information to return.  Currently, the options are "all", "distance", "path", or "time"
 #'@param service API to use.  Currently the only option is "bing"
@@ -166,6 +166,10 @@ gGeoCode <- function(...) {
 #'georoute( c("3817 Spruce St, Philadelphia, PA 19104", "Tulum, MX","9000 Rockville Pike, Bethesda, Maryland 20892"), returntype="distance" )
 #'georoute( c("3817 Spruce St, Philadelphia, PA 19104", "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE, returntype="path" )
 #'georoute( c("3817 Spruce St, Philadelphia, PA 19104", "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE, returntype="time" )
+#'# Using lat/lon
+#'xmat <- rbind( geocode( "3817 Spruce St, Philadelphia, PA 19104" ), geocode( "9000 Rockville Pike, Bethesda, Maryland 20892" ) )
+#'colnames(xmat) <- c( 'lat', 'lon' )
+#'georoute( xmat, verbose=TRUE, returntype = "all" )
 #'}
 #'@rdname georoute
 #'@export georoute
@@ -185,6 +189,9 @@ georoute.default <- function( x, verbose=FALSE, service="bing", returntype="all"
   # URL constructing
   construct.georoute.url <- list()
   construct.georoute.url[["bing"]] <- function(waypoints, maxSolutions=1, optimize="time", distanceUnit="km",travelMode="Driving",path=(returntype=="path") ) { # documented at http://msdn.microsoft.com/en-us/library/ff701717
+    if( class(waypoints) == "matrix" ) { # handle lat/lon cases by converting to character strings separated by commas (e.g. 42.5,-77 gets converted to "42.5,-77" for use in the URL)
+      waypoints <- apply( waypoints, 1, paste0, collapse="," )
+    }
     root <- "http://dev.virtualearth.net/REST/v1/Routes"
     waypointsquery <- paste("wayPoint.",seq_along(waypoints),"=",waypoints,collapse="&",sep="")
     routePathOutputquery <- ifelse(path,"&routePathOutput=Points","")
