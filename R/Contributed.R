@@ -125,7 +125,7 @@ geocode.data.frame <- function(x, verbose=FALSE, service="google", returntype="c
     if(class(res)=="try-error") res <- c(NA,NA)
     res
   }
-  latlon <- t(sapply(x[[addresscol]][sel],gcRobust ))
+  latlon <- stack( lapply(x[[addresscol]][sel],gcRobust ))
   rownames(latlon) <- NULL
   latlonDF <- as.data.frame(latlon)
   colnames(latlonDF) <- c("lat","lon")
@@ -222,6 +222,7 @@ georoute.default <- function( x, verbose=FALSE, service="bing", returntype="all"
       if( "distanceUnit" %in% returntype ) res[[ "distanceUnit" ]] <- rt$distanceUnit
       if( "time" %in% returntype ) res[[ "time" ]] <- rt$travelDuration
       if( "timeUnit" %in% returntype ) res[[ "timeUnit" ]] <- rt$durationUnit
+      res <- as.data.frame(res)
     }
     res
   }
