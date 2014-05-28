@@ -8,15 +8,15 @@
 #'@aliases geocode geocode.default geocode.data.frame
 #'@param x A vector or data.frame
 #'@param verbose Whether to display each address as it is submitted to Google or not
-#'@param service API to use.  Current options are "bing" or "google"
+#'@param service API to use.  Current options are "bing" or "google".  To add your Bing API key, set options(BingMapsKey="yourkeygoeshere").
 #'@param returntype What to return.  Options include "coordinates" and "zip".
 #'@param addresscol A (character) name of the column in a data.frame which contains the addresses
 #'@param \dots Other items to pass along
 #'@return geocode.default returns a numeric vector of length 2 containing the
 #'latitudes and longitudes. geocode.data.frame returns the original data.frame
 #'with two additional columns for the longitude and latitudes.
-#'@author Basic REST algorithm by Tony Breyal (http://stackoverflow.com/a/3259537/636656). Error handling, object orientation, and Bing
-#' capabilities by Ari Friedman
+#'@author Error handling, object orientation, and Bing
+#' capabilities by Ari Friedman. Google REST algorithm by Tony Breyal (http://stackoverflow.com/a/3259537/636656). 
 #'@examples
 #'\dontrun{
 #'geocode("3817 Spruce St, Philadelphia, PA 19104")
