@@ -20,11 +20,9 @@ Suggests:
     akima,
     mgcv,
     caTools,
-    pspline,
-    lattice
+    pspline
 Imports:
-    taRifx
-Depends:
+    taRifx,
     sp,
     rgdal,
     methods,

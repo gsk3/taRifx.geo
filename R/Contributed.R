@@ -12,6 +12,7 @@
 #'@param returntype What to return.  Options include "coordinates" and "zip".
 #'@param addresscol A (character) name of the column in a data.frame which contains the addresses
 #'@param \dots Other items to pass along
+#'@import RCurl RJSONIO
 #'@return geocode.default returns a numeric vector of length 2 containing the
 #'latitudes and longitudes. geocode.data.frame returns the original data.frame
 #'with two additional columns for the longitude and latitudes.

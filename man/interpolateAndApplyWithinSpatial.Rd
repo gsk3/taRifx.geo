@@ -59,10 +59,10 @@ require(rgdal)
 distanceMatrix <- function( points1, points2, dist.fn=rdist.earth ) {
  cat( "Generating distance matrix for ",length(points1)," by ", length(points2), " matrix.\\n" )
  if(!is.na(proj4string(points1))) {
-   points1 <- spTransform( points1, CRS("+proj=longlat +datum=WGS84") )
+   points1 <- spTransform( points1, sp::CRS("+proj=longlat +datum=WGS84") )
  }
  if(!is.na(proj4string(points2))) {
-   points2 <- spTransform( points2, CRS("+proj=longlat +datum=WGS84") )
+   points2 <- spTransform( points2, sp::CRS("+proj=longlat +datum=WGS84") )
  }
  dist.fn( coordinates(points1), coordinates(points2) )
 }

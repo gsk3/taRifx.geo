@@ -4,7 +4,7 @@
 Bounding box is first created (in lat/lon) then projected if specified}
 \usage{
   as.SpatialPolygons.bbox(bbox,
-    proj4stringFrom = CRS("+proj=longlat +datum=WGS84"),
+    proj4stringFrom = sp::CRS("+proj=longlat +datum=WGS84"),
     proj4stringTo = NULL, interpolate = 0)
 }
 \arguments{
