@@ -1,4 +1,4 @@
-# Create spatial data for examples
+# Data for taRifx.geo examples
 
 require(sp)
 Srs1 = Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1")

@@ -1,6 +1,7 @@
 \name{cleanLatLon}
 \alias{cleanLatLon}
-\title{Standardize latitude/longitude coordinates}
+\title{Standardize latitude/longitude coordinates
+Cleans up character representations of lat/lon coordinates}
 \usage{
   cleanLatLon(vec)
 }
@@ -11,6 +12,7 @@
   Numeric decimal lat/lon
 }
 \description{
-  Standardize latitude/longitude coordinates
+  Standardize latitude/longitude coordinates Cleans up
+  character representations of lat/lon coordinates
 }
 

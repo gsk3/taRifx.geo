@@ -7,7 +7,7 @@ Author: Ari B. Friedman
 Maintainer: Ari B. Friedman <abfriedman@gmail.com>
 Description: A collection of miscellaneous spatial object manipulation functions
 License: GPL (>= 2)
-LazyLoad: no
+LazyLoad: yes
 Suggests:
     gdata,
     fields,
@@ -20,16 +20,17 @@ Suggests:
     akima,
     mgcv,
     caTools,
-    pspline,
-    RCurl,
-    RJSONIO,
-    rgeos
+    pspline
 Depends:
     taRifx,
     sp,
+    rgdal,
     plyr,
     reshape2,
-    methods
+    methods,
+    RCurl,
+    RJSONIO,
+    rgeos
 Collate:
     'Contributed.R'
     'R-GIS.R'

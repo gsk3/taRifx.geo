@@ -1,6 +1,17 @@
 # Miscellaneous functions to do GIS-like manipulation of spatial objects
 
 
+#' Entirely fabricated spatial data for taRifx.geo examples
+#' @name Srs1
+#' @aliases Srs2 Srs3 Srs4 box pointSP pointSP2 polySP
+#' @docType data
+#' @keywords data
+NULL
+
+
+
+
+
 #'Cartesian distance between points
 #'
 #'@aliases simpledist
@@ -17,6 +28,7 @@ simpledist = function(points) {
 	distance = sqrt( ( points[1,1] - points[2,1] )^2 + ( points[1,2] - points[2,2] )^2 )
 	return(distance)
 }
+
 #' Find closest point to a given point's coordinates (closestPoint).
 #'
 #'@aliases closestPoint
@@ -178,7 +190,7 @@ pointgrid2SpatialPolygons=function(df,type) {
 #'@param \dots Arguments to pass to SpatialPolygonsDataFrame() or
 #'SpatialPointsDataFrame() when reconstructing objects
 #'@return SpatialPolygonsDataFrame or SpatialPointsDataFrame
-#'@export subsetSPDF subset.SpatialPolygonsDataFrame
+#'@export subsetSPDF subset.SpatialPolygonsDataFrame subset.SpatialPointsDataFrame
 #'
 subsetSPDF = function(x,tf,...) {
 	selected_data <- subset(x@data, tf)
@@ -335,7 +347,7 @@ reshapeSLDF = function(SLDF,shape="long") {
 #'@export interpolatePathpoints
 #'
 interpolatePathpoints = function(pathpoints,dens,tolerance.min=1.2,tolerance.max=50) {
-  require(taRifx)
+  #require(taRifx)
 	# dens actually inverse density and is in the units of the x and y in pathpoints (e.g. 1 point per density meters)
 	# tolerance.min is in the proportion of the density (e.g. 1.2 means we'll fill in gaps 20% greater than the density size)
 
@@ -492,6 +504,7 @@ SPDFtoPointsDF <- function(SPDF) {
 #' @param value The character vector to assign to the IDs
 #' @param \dots Pass-alongs
 #' @author Ari B. Friedman
+#' @export
 #' @rdname IDs
 IDs <- function( x, ... ) {
   UseMethod("IDs",x)
@@ -605,7 +618,8 @@ setMethod(
 #' @param interpolate If nonzero, the number of nodes per side to add in (helps maintain coverage if you're projecting)
 #' @seealso \code{\link{clipToExtent}} which uses the output of this to clip to a bounding box
 #' @return A SpatialPolygons object of the bounding box
-#' @example 
+#' @export as.SpatialPolygons.bbox
+#' @examples
 #' bb <- matrix(c(3,2,5,4),nrow=2)
 #' rownames(bb) <- c("lon","lat")
 #' colnames(bb) <- c('min','max')
@@ -637,7 +651,8 @@ as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=CRS("+proj=longlat +d
 #' @param extent a SpatialPolygons object - any part of sp not within a polygon will be discarded
 #' @seealso \code{\link{as.SpatialPolygons.bbox}} to create a SP from a bbox
 #' @return A spatial object of the same type
-#' @example
+#' @export clipToExtent
+#' @examples
 #' set.seed(1)
 #' P4S.latlon <- CRS("+proj=longlat +datum=WGS84")
 #' ply <- SpatialPolygons(list(Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")), proj4string=P4S.latlon)
@@ -646,6 +661,7 @@ as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=CRS("+proj=longlat +d
 #' bb <- matrix(c(3,2,5,4),nrow=2)
 #' rownames(bb) <- c("lon","lat")
 #' colnames(bb) <- c('min','max')
+#' require(rgdal)
 #' bbSP <- as.SpatialPolygons.bbox(bb, proj4stringTo=P4S.latlon )
 #' # Clip to extent
 #' plyClip <- clipToExtent( ply, bbSP )
@@ -657,7 +673,7 @@ as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=CRS("+proj=longlat +d
 #' plot( plyClip, add=TRUE, border="red")
 #' plot( pntClip, add=TRUE, col="red", pch="o")
 clipToExtent <- function( sp, extent ) {
-  require(rgeos)
+  #require(rgeos)
   keep <- gContains( extent, sp,byid=TRUE ) | gOverlaps( extent, sp,byid=TRUE )
   stopifnot( ncol(keep)==1 )
   sp[drop(keep),]
@@ -678,18 +694,17 @@ clipToExtent <- function( sp, extent ) {
 #' @param samplesize The number of replicates per element of crude to draw
 #' @param simplify Whether to simplify to an array or not
 #' @param \dots Arguments to be passed to FUN
-#' @export 
+#' @export interpolateAndApplyWithinSpatial
 #' @return list of length length(crude) where each element is a list of length samplesize containing the results of FUN for that crude-element/sample
 #' @examples
+#' # Not run because too time-consuming
 #' \dontrun{
 #' require(fields)
 #' require(rgdal)
-#' require(functional)
-#' distanceMatrix <- function( points1, points2, dist.fn=Curry(rdist.earth,miles=FALSE) ) {
+#' distanceMatrix <- function( points1, points2, dist.fn=rdist.earth ) {
 #'  cat( "Generating distance matrix for ",length(points1)," by ", length(points2), " matrix.\n" )
 #'  if(!is.na(proj4string(points1)))  points1 <- spTransform( points1, CRS("+proj=longlat +datum=WGS84") )
 #'  if(!is.na(proj4string(points2)))  points2 <- spTransform( points2, CRS("+proj=longlat +datum=WGS84") )
-#'  dist.fn( points1@coords, points2@coords )
 #' }
 #' # One option: Use the apply functionality
 #' dist <- interpolateAndApplyWithinSpatial( crude=polySP, fine=pointSP, FUN=distanceMatrix, nSampleCol="z", samplesize=25,  points2=pointSP2, simplify=TRUE )
@@ -710,6 +725,7 @@ interpolateAndApplyWithinSpatial <- function( crude, fine, FUN, nSampleCol, samp
     do.call( interpolateWithinSingleSpatial, ellipsisList )
   })
 }
+
 #' Interpolate and sample within a single polygon
 #' (Called by interpolateWithinSpatial)
 #' @param crudeSingle A single polygon
@@ -719,6 +735,7 @@ interpolateAndApplyWithinSpatial <- function( crude, fine, FUN, nSampleCol, samp
 #' @param samplesize The number of replicates per element of crude to draw
 #' @param simplify Whether to simplify to an array or not
 #' @param \dots Arguments to FUN
+#' @export interpolateWithinSingleSpatial
 #' @return List of FUN's results for each sampling
 interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampleCol, samplesize, simplify=FALSE, ... ) {
   if(length(fineWithin)<=0) {
@@ -748,9 +765,12 @@ interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampl
 #' @param nSampleCol Either a column name in crude containing number of elements of fineWithin to sample per polygon, or a number of points to sample per polygon
 #' @param replace A logical indicating whether to sample points from fine with replacement or not within each polygon of crude
 #' @param verbose Whether to output detailed error messages
+#' @export interpolatePolyPoint
 #' @return A SpatialPointsDataFrame containing 
 #' @examples
+#' \dontrun{
 #' replicate( 10, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE, verbose=TRUE ), simplify=FALSE )
+#' }
 interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, replace=TRUE, verbose=FALSE ) {
   if(class(crude)!="SpatialPolygonsDataFrame") stop("Crude must be a SpatialPolygonsDataFrame.\n")
   if(class(fine)!="SpatialPointsDataFrame") stop("Fine must be a SpatialPointsDataFrame.\n")
@@ -810,6 +830,7 @@ interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, rep
 #' Overlay, in the sense described here: http://resources.esri.com/help/9.3/ArcGISengine/java/Gp_ToolRef/geoprocessing/overlay_analysis.htm
 #' @param poly1 SPDF
 #' @param poly2 SPDF
+#' @export overlayPolyPoly
 #' @return A SPDF with nested polygons of each
 overlayPolyPoly <- function(poly1,poly2) {
   pieces <- list()

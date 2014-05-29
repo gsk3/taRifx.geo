@@ -27,8 +27,8 @@
 #'@rdname geocode
 #'@export geocode
 geocode <- function( x, verbose=FALSE, service="google", returntype="coordinates", ... ) {
-  require(RCurl)
-  require(RJSONIO)
+  #require(RCurl)
+  #require(RJSONIO)
   UseMethod("geocode",x)
 }
 #'@rdname geocode
@@ -174,8 +174,8 @@ gGeoCode <- function(...) {
 #'@rdname georoute
 #'@export georoute
 georoute <- function( x, verbose=FALSE, service="bing", returntype="all", ... ) {
-  require(RCurl)
-  require(RJSONIO)
+  #require(RCurl)
+  #require(RJSONIO)
   UseMethod("georoute",x)
 }
 #'@rdname georoute

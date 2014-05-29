@@ -1,6 +1,7 @@
 \name{lineDist}
 \alias{lineDist}
-\title{Line distance in SpatialLinesDataFrame}
+\title{Line distance in SpatialLinesDataFrame
+Stores length of each line segment in a SpatialLinesDataFrame's data.frame}
 \usage{
   lineDist(SLDF, varname = "distances")
 }
@@ -14,7 +15,7 @@
   Returns a SpatialLinesDataFrame
 }
 \description{
-  Stores length of each line segment in a
-  SpatialLinesDataFrame's data.frame
+  Line distance in SpatialLinesDataFrame Stores length of
+  each line segment in a SpatialLinesDataFrame's data.frame
 }
 

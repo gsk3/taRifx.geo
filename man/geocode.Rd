@@ -4,13 +4,15 @@
 \alias{geocode.default}
 \title{Geocode character vectors using online services}
 \usage{
-  geocode(x, verbose = FALSE, service = "google", ...)
+  geocode(x, verbose = FALSE, service = "google",
+    returntype = "coordinates", ...)
 
   \method{geocode}{default} (x, verbose = FALSE,
-    service = "google", ...)
+    service = "google", returntype = "coordinates", ...)
 
   \method{geocode}{data.frame} (x, verbose = FALSE,
-    service = "google", addresscol = "address", ...)
+    service = "google", returntype = "coordinates",
+    addresscol = "address", ...)
 }
 \arguments{
   \item{x}{A vector or data.frame}
@@ -18,11 +20,15 @@
   \item{verbose}{Whether to display each address as it is
   submitted to Google or not}
 
+  \item{service}{API to use.  Current options are "bing" or
+  "google".  To add your Bing API key, set
+  options(BingMapsKey="yourkeygoeshere").}
+
+  \item{returntype}{What to return.  Options include
+  "coordinates" and "zip".}
+
   \item{addresscol}{A (character) name of the column in a
   data.frame which contains the addresses}
-
-  \item{service}{API to use.  Current options are "bing" or
-  "google"}
 
   \item{\dots}{Other items to pass along}
 }
@@ -45,9 +51,8 @@ geocode(dat)
 }
 }
 \author{
-  Basic REST algorithm by Tony Breyal
-  (http://stackoverflow.com/a/3259537/636656). Error
-  handling, object orientation, and Bing capabilities by
-  Ari Friedman
+  Error handling, object orientation, and Bing capabilities
+  by Ari Friedman. Google REST algorithm by Tony Breyal
+  (http://stackoverflow.com/a/3259537/636656).
 }
 
