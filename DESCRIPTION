@@ -20,13 +20,13 @@ Suggests:
     akima,
     mgcv,
     caTools,
-    pspline
+    pspline,
+    lattice
+Imports:
+    taRifx
 Depends:
-    taRifx,
     sp,
     rgdal,
-    plyr,
-    reshape2,
     methods,
     RCurl,
     RJSONIO,

@@ -378,7 +378,7 @@ interpolatePathpoints = function(pathpoints,dens,tolerance.min=1.2,tolerance.max
 			pointsToAdd = as.integer(floor(pp$distToNext[numRows] / dens)) # number of points to add
 			xIncrement = ((pp$xNext - pp$x) / (pointsToAdd+1))[numRows]
 			yIncrement = ((pp$yNext - pp$y) / (pointsToAdd+1))[numRows]
-			pp <- expandDF(pp,numRows,pointsToAdd)
+			pp <- taRifx::expandDF(pp,numRows,pointsToAdd)
 
 			for(pointNum in 1:pointsToAdd) {
 				pp[numRows+pointNum,"x"] = pp[numRows+pointNum-1,"x"] + xIncrement
@@ -655,7 +655,10 @@ as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=CRS("+proj=longlat +d
 #' @examples
 #' set.seed(1)
 #' P4S.latlon <- CRS("+proj=longlat +datum=WGS84")
-#' ply <- SpatialPolygons(list(Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")), proj4string=P4S.latlon)
+#' ply <- SpatialPolygons(list(
+#'    Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),
+#'    Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")
+#'  ), proj4string=P4S.latlon)
 #' pnt <- SpatialPoints( matrix(rnorm(100),ncol=2)+2, proj4string=P4S.latlon )
 #' # Make bounding box as Spatial Polygon
 #' bb <- matrix(c(3,2,5,4),nrow=2)
@@ -703,13 +706,24 @@ clipToExtent <- function( sp, extent ) {
 #' require(rgdal)
 #' distanceMatrix <- function( points1, points2, dist.fn=rdist.earth ) {
 #'  cat( "Generating distance matrix for ",length(points1)," by ", length(points2), " matrix.\n" )
-#'  if(!is.na(proj4string(points1)))  points1 <- spTransform( points1, CRS("+proj=longlat +datum=WGS84") )
-#'  if(!is.na(proj4string(points2)))  points2 <- spTransform( points2, CRS("+proj=longlat +datum=WGS84") )
+#'  if(!is.na(proj4string(points1))) {
+#'    points1 <- spTransform( points1, CRS("+proj=longlat +datum=WGS84") )
+#'  }
+#'  if(!is.na(proj4string(points2))) {
+#'    points2 <- spTransform( points2, CRS("+proj=longlat +datum=WGS84") )
+#'  }
+#'  dist.fn( coordinates(points1), coordinates(points2) )
 #' }
 #' # One option: Use the apply functionality
-#' dist <- interpolateAndApplyWithinSpatial( crude=polySP, fine=pointSP, FUN=distanceMatrix, nSampleCol="z", samplesize=25,  points2=pointSP2, simplify=TRUE )
+#' dist <- interpolateAndApplyWithinSpatial( 
+#'  crude=polySP, fine=pointSP, 
+#'  FUN=distanceMatrix, 
+#'  nSampleCol="z", samplesize=25,  
+#'  points2=pointSP2, simplify=TRUE 
+#' )
 #' # Dist now is a list of 3 matrices, each with dimensions: N x length(pointSP2) x samplesize
-#' # Each matrix represents N entities imputed from a single polygon, so we can actually simplify further
+#' # Each matrix represents N entities imputed from a single polygon, 
+#' #   so we can actually simplify further
 #' library(abind)
 #' distmat <- do.call( Curry(abind, along=1), dist )
 #' mindist <- apply( distmat, 3, function(x) { # For each realization of the 'world'
@@ -769,7 +783,11 @@ interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampl
 #' @return A SpatialPointsDataFrame containing 
 #' @examples
 #' \dontrun{
-#' replicate( 10, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE, verbose=TRUE ), simplify=FALSE )
+#' replicate( 10, interpolatePolyPoint( 
+#'   crude=polySP, fine=pointSP, 
+#'   weightCol="pop", nSampleCol="z", 
+#'   replace=TRUE, verbose=TRUE ), 
+#' simplify=FALSE )
 #' }
 interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, replace=TRUE, verbose=FALSE ) {
   if(class(crude)!="SpatialPolygonsDataFrame") stop("Crude must be a SpatialPolygonsDataFrame.\n")

@@ -46,7 +46,10 @@
 \dontrun{
 geocode("3817 Spruce St, Philadelphia, PA 19104")
 geocode("Philadelphia, PA")
-dat <- data.frame(value=runif(3),address=c("3817 Spruce St, Philadelphia, PA 19104","Philadelphia, PA","Neverneverland"))
+dat <- data.frame(
+ value=runif(3),
+ address=c("3817 Spruce St, Philadelphia, PA 19104","Philadelphia, PA","Neverneverland")
+)
 geocode(dat)
 }
 }

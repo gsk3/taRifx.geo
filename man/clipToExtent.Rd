@@ -22,7 +22,10 @@ Currently does the sloppy thing and returns any object that has any area inside 
 \examples{
 set.seed(1)
 P4S.latlon <- CRS("+proj=longlat +datum=WGS84")
-ply <- SpatialPolygons(list(Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")), proj4string=P4S.latlon)
+ply <- SpatialPolygons(list(
+   Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),
+   Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")
+ ), proj4string=P4S.latlon)
 pnt <- SpatialPoints( matrix(rnorm(100),ncol=2)+2, proj4string=P4S.latlon )
 # Make bounding box as Spatial Polygon
 bb <- matrix(c(3,2,5,4),nrow=2)

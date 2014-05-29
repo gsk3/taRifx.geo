@@ -37,7 +37,11 @@ Thus running it repeatedly gives you useful variation that reflects the interpol
 }
 \examples{
 \dontrun{
-replicate( 10, interpolatePolyPoint( crude=polySP, fine=pointSP, weightCol="pop", nSampleCol="z", replace=TRUE, verbose=TRUE ), simplify=FALSE )
+replicate( 10, interpolatePolyPoint(
+  crude=polySP, fine=pointSP,
+  weightCol="pop", nSampleCol="z",
+  replace=TRUE, verbose=TRUE ),
+simplify=FALSE )
 }
 }
 

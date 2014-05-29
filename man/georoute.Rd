@@ -35,12 +35,19 @@
 }
 \examples{
 \dontrun{
-georoute( c("3817 Spruce St, Philadelphia, PA 19104", "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE )
-georoute( c("3817 Spruce St, Philadelphia, PA 19104", "Tulum, MX","9000 Rockville Pike, Bethesda, Maryland 20892"), returntype="distance" )
-georoute( c("3817 Spruce St, Philadelphia, PA 19104", "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE, returntype="path" )
-georoute( c("3817 Spruce St, Philadelphia, PA 19104", "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE, returntype="time" )
+georoute( c("3817 Spruce St, Philadelphia, PA 19104",
+ "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE )
+georoute( c("3817 Spruce St, Philadelphia, PA 19104",
+ "Tulum, MX","9000 Rockville Pike, Bethesda, Maryland 20892"), returntype="distance" )
+georoute( c("3817 Spruce St, Philadelphia, PA 19104",
+ "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE, returntype="path" )
+georoute( c("3817 Spruce St, Philadelphia, PA 19104",
+ "9000 Rockville Pike, Bethesda, Maryland 20892"), verbose=TRUE, returntype="time" )
 # Using lat/lon
-xmat <- rbind( geocode( "3817 Spruce St, Philadelphia, PA 19104" ), geocode( "9000 Rockville Pike, Bethesda, Maryland 20892" ) )
+xmat <- rbind(
+ geocode( "3817 Spruce St, Philadelphia, PA 19104" ),
+ geocode( "9000 Rockville Pike, Bethesda, Maryland 20892" )
+)
 colnames(xmat) <- c( 'lat', 'lon' )
 georoute( xmat, verbose=TRUE, returntype = c("distance","distanceUnit") )
 }

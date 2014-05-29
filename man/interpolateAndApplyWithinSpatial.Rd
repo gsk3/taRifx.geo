@@ -58,13 +58,24 @@ require(fields)
 require(rgdal)
 distanceMatrix <- function( points1, points2, dist.fn=rdist.earth ) {
  cat( "Generating distance matrix for ",length(points1)," by ", length(points2), " matrix.\\n" )
- if(!is.na(proj4string(points1)))  points1 <- spTransform( points1, CRS("+proj=longlat +datum=WGS84") )
- if(!is.na(proj4string(points2)))  points2 <- spTransform( points2, CRS("+proj=longlat +datum=WGS84") )
+ if(!is.na(proj4string(points1))) {
+   points1 <- spTransform( points1, CRS("+proj=longlat +datum=WGS84") )
+ }
+ if(!is.na(proj4string(points2))) {
+   points2 <- spTransform( points2, CRS("+proj=longlat +datum=WGS84") )
+ }
+ dist.fn( coordinates(points1), coordinates(points2) )
 }
 # One option: Use the apply functionality
-dist <- interpolateAndApplyWithinSpatial( crude=polySP, fine=pointSP, FUN=distanceMatrix, nSampleCol="z", samplesize=25,  points2=pointSP2, simplify=TRUE )
+dist <- interpolateAndApplyWithinSpatial(
+ crude=polySP, fine=pointSP,
+ FUN=distanceMatrix,
+ nSampleCol="z", samplesize=25,
+ points2=pointSP2, simplify=TRUE
+)
 # Dist now is a list of 3 matrices, each with dimensions: N x length(pointSP2) x samplesize
-# Each matrix represents N entities imputed from a single polygon, so we can actually simplify further
+# Each matrix represents N entities imputed from a single polygon,
+#   so we can actually simplify further
 library(abind)
 distmat <- do.call( Curry(abind, along=1), dist )
 mindist <- apply( distmat, 3, function(x) { # For each realization of the 'world'
