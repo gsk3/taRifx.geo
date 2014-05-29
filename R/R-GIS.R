@@ -163,14 +163,14 @@ pointgrid2SpatialPolygons=function(df,type) {
 	}
 	
 	#Output SpatialPolygons(DataFrame)
-	df_sp=as.SpatialPolygons.GridTopology(points2grid(df))
+	df_sp=sp::as.SpatialPolygons.GridTopology(points2grid(df))
 	if(type=="SpatialPolygons") {
 		return (df_sp)
 	}
 	if(type=="SpatialPolygonsDataFrame") {
 		data=as.data.frame(rep(0,length(df_sp@plotOrder)))
 		rownames(data)<-getSpPPolygonsIDSlots(df_sp)
-		return(SpatialPolygonsDataFrame(df_sp,data))
+		return(sp::SpatialPolygonsDataFrame(df_sp,data))
 	}
 	
 	#Otherwise
@@ -195,13 +195,13 @@ subsetSPDF = function(x,tf,...) {
 	selected_data <- subset(x@data, tf)
 	if(class(x)=="SpatialPolygonsDataFrame") {
 		SPDF_selected <- subset(x@polygons, tf)
-		centroids <- getSpPPolygonsLabptSlots(as.SpatialPolygons.PolygonsList(SPDF_selected))
+		centroids <- sp::getSpPPolygonsLabptSlots(sp::as.SpatialPolygons.PolygonsList(SPDF_selected))
 		xs <- centroids[,1]
 		ys <- centroids[,2]
-		export <- SpatialPolygonsDataFrame(as.SpatialPolygons.PolygonsList(SPDF_selected),data=data.frame(x=xs, y=ys,row.names=getSpPPolygonsIDSlots(as.SpatialPolygons.PolygonsList(SPDF_selected)),selected_data),...)
+		export <- sp::SpatialPolygonsDataFrame(sp::as.SpatialPolygons.PolygonsList(SPDF_selected),data=data.frame(x=xs, y=ys,row.names=sp::getSpPPolygonsIDSlots(sp::as.SpatialPolygons.PolygonsList(SPDF_selected)),selected_data),...)
 	}
 	if(class(x)=="SpatialPointsDataFrame") {
-		export <- SpatialPointsDataFrame(coordinates(x)[tf,],data=selected_data,coords.nrs=x@coords.nrs,proj4string=x@proj4string,...)
+		export <- sp::SpatialPointsDataFrame(sp::coordinates(x)[tf,],data=selected_data,coords.nrs=x@coords.nrs,proj4string=x@proj4string,...)
 	}
 	return(export)
 }
@@ -231,7 +231,7 @@ SPDFareas = function(SPDF,colname="AREA") {
 	for(polyNum in 1:numPolys) {
 		areas[[colname]][polyNum] <- SPDF@polygons[[polyNum]]@area
 	}
-	returnSPDF = SpatialPolygonsDataFrame(polygons(SPDF),data=cbind(SPDF@data,areas),match.ID=TRUE)
+	returnSPDF = sp::SpatialPolygonsDataFrame(sp::polygons(SPDF),data=cbind(SPDF@data,areas),match.ID=TRUE)
   return(returnSPDF)
 }
 
@@ -287,7 +287,7 @@ countPointsInPolys = function(points,polys,density=FALSE,by=NULL) {
     x[is.na(x)] <- 0
     x
   } )
-  SpatialPolygonsDataFrame(polygons(polys),data=DF,match.ID=TRUE)
+  sp::SpatialPolygonsDataFrame(polygons(polys),data=DF,match.ID=TRUE)
 }
 
 #'Reshape a spatialLinesDataFrame into a series of points with associated
@@ -582,7 +582,7 @@ rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
   # One call to bind them all
   pl = do.call("rbind", lapply(dots, function(x) as(x, "SpatialPolygons")))
   df = do.call("rbind", lapply(dots, function(x) x@data))
-  SpatialPolygonsDataFrame(pl, df)
+  sp::SpatialPolygonsDataFrame(pl, df)
 }
 
 #' Merge a SpatialPolygonsDataFrame with a data.frame
@@ -607,8 +607,7 @@ setMethod(
     x$.rowNames <- rownames(x@data)
     x$.sortOrder <- seq(nrow(x))
     newDF <- merge.data.frame( x@data, y, all.x=TRUE, all.y=FALSE, sort=FALSE, ... )
-    nrowAf
-    ter <- nrow(newDF)
+    nrowAfter <- nrow(newDF)
     stopifnot(nrowBefore==nrowAfter)
     x@data <- newDF
     x@data <- x@data[ order(x$.sortOrder), ]
@@ -648,9 +647,9 @@ as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=sp::CRS("+proj=longla
     }
     bboxMat[nrow(bboxMat),] <- bboxOrig[5,]
   }
-  bboxSP <- SpatialPolygons( list(Polygons(list(Polygon(bboxMat)),"bbox")), proj4string=proj4stringFrom  )
+  bboxSP <- sp::SpatialPolygons( list(Polygons(list(Polygon(bboxMat)),"bbox")), proj4string=proj4stringFrom  )
   if(!is.null(proj4stringTo)) {
-    bboxSP <- spTransform( bboxSP, proj4stringTo )
+    bboxSP <- sp::spTransform( bboxSP, proj4stringTo )
   }
   bboxSP
 }
@@ -665,17 +664,18 @@ as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=sp::CRS("+proj=longla
 #' @import methods rgdal rgeos sp
 #' @examples
 #' set.seed(1)
+#' require(rgdal)
+#' require(sp)
 #' P4S.latlon <- sp::CRS("+proj=longlat +datum=WGS84")
-#' ply <- SpatialPolygons(list(
-#'    Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),
-#'    Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")
+#' ply <- sp::SpatialPolygons(list(
+#'    sp::Polygons(list(Polygon(cbind(c(2,4,4,1,2),c(2,3,5,4,2)))), "s1"),
+#'    sp::Polygons(list(Polygon(cbind(c(5,4,2,5),c(2,3,2,2)))), "s2")
 #'  ), proj4string=P4S.latlon)
-#' pnt <- SpatialPoints( matrix(rnorm(100),ncol=2)+2, proj4string=P4S.latlon )
+#' pnt <- sp::SpatialPoints( matrix(rnorm(100),ncol=2)+2, proj4string=P4S.latlon )
 #' # Make bounding box as Spatial Polygon
 #' bb <- matrix(c(3,2,5,4),nrow=2)
 #' rownames(bb) <- c("lon","lat")
 #' colnames(bb) <- c('min','max')
-#' require(rgdal)
 #' bbSP <- as.SpatialPolygons.bbox(bb, proj4stringTo=P4S.latlon )
 #' # Clip to extent
 #' plyClip <- clipToExtent( ply, bbSP )
@@ -719,10 +719,10 @@ clipToExtent <- function( sp, extent ) {
 #' distanceMatrix <- function( points1, points2, dist.fn=rdist.earth ) {
 #'  cat( "Generating distance matrix for ",length(points1)," by ", length(points2), " matrix.\n" )
 #'  if(!is.na(proj4string(points1))) {
-#'    points1 <- spTransform( points1, sp::CRS("+proj=longlat +datum=WGS84") )
+#'    points1 <- sp::spTransform( points1, sp::CRS("+proj=longlat +datum=WGS84") )
 #'  }
 #'  if(!is.na(proj4string(points2))) {
-#'    points2 <- spTransform( points2, sp::CRS("+proj=longlat +datum=WGS84") )
+#'    points2 <- sp::spTransform( points2, sp::CRS("+proj=longlat +datum=WGS84") )
 #'  }
 #'  dist.fn( coordinates(points1), coordinates(points2) )
 #' }
@@ -826,7 +826,7 @@ interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, rep
         }
         fineBlankRow <- fine@data[1,,drop=FALSE] # Make a blank data.frame so we've got the columns similar to the SPDFs where there was overlap
         fineBlankRow[,] <- NA
-        fineSamp <- SpatialPointsDataFrame( fineOver, data=fineBlankRow[rep(1,sz),,drop=FALSE] )
+        fineSamp <- sp::SpatialPointsDataFrame( fineOver, data=fineBlankRow[rep(1,sz),,drop=FALSE] )
         fineSamp$imputationMethod <- "Random within crude polygon"
       } else { # If there's overlap (as there should be for most points)
         if( class(weightCol)=="character") {
