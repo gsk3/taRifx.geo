@@ -25,10 +25,10 @@ Imports:
     taRifx,
     sp,
     rgdal,
-    methods,
-    RCurl,
     RJSONIO,
-    rgeos
+    rgeos,
+    RCurl,
+    methods
 Collate:
     'Contributed.R'
     'R-GIS.R'

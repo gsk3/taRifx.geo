@@ -12,7 +12,7 @@
 #'@param returntype What to return.  Options include "coordinates" and "zip".
 #'@param addresscol A (character) name of the column in a data.frame which contains the addresses
 #'@param \dots Other items to pass along
-#'@import RCurl RJSONIO
+#'@import RJSONIO
 #'@return geocode.default returns a numeric vector of length 2 containing the
 #'latitudes and longitudes. geocode.data.frame returns the original data.frame
 #'with two additional columns for the longitude and latitudes.
@@ -31,8 +31,6 @@
 #'@rdname geocode
 #'@export geocode
 geocode <- function( x, verbose=FALSE, service="google", returntype="coordinates", ... ) {
-  #require(RCurl)
-  #require(RJSONIO)
   UseMethod("geocode",x)
 }
 #'@rdname geocode
@@ -58,8 +56,8 @@ geocode.default <- function(x,verbose=FALSE, service="google", returntype="coord
   }
   if(verbose) message(x,appendLF=FALSE)
   u <- construct.geocode.url[[service]](x)
-  doc <- getURL(u)
-  j <- fromJSON(doc,simplify = FALSE)
+  doc <- RCurl::getURL(u)
+  j <- RJSONIO::fromJSON(doc,simplify = FALSE)
   # Parse and return
   parse.json <- list()
   parse.json[["google"]] <- function(j) {
@@ -185,8 +183,6 @@ gGeoCode <- function(...) {
 #'@rdname georoute
 #'@export georoute
 georoute <- function( x, verbose=FALSE, service="bing", returntype="all", ... ) {
-  #require(RCurl)
-  #require(RJSONIO)
   UseMethod("georoute",x)
 }
 #'@rdname georoute
@@ -214,8 +210,8 @@ georoute.default <- function( x, verbose=FALSE, service="bing", returntype="all"
   }
   if(verbose) message(x,appendLF=FALSE)
   u <- construct.georoute.url[[service]](x)
-  doc <- getURL(u)
-  j <- fromJSON(doc,simplify = FALSE)
+  doc <- RCurl::getURL(u)
+  j <- RJSONIO::fromJSON(doc,simplify = FALSE)
   # Parse and return
   parse.json <- list()
   parse.json[["bing"]] <- function(j) {

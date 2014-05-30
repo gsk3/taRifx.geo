@@ -55,7 +55,7 @@ closestPoint = function(point,points) {
 #'@return data.frame
 #'@seealso See Also \code{\link{reshapeSLDF}}
 #'@export SLDFtoLine
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 SLDFtoLine = function(lineDF,orderXY=FALSE,segments=TRUE) {
 	# Initialize variables
 	X = c()
@@ -102,7 +102,7 @@ SLDFtoLine = function(lineDF,orderXY=FALSE,segments=TRUE) {
 #'@return SpatialLinesDataFrame
 #'@seealso See Also as \code{\link{SLDFtoLine}}, ~~~
 #'@export smoothLines
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 smoothLines=function(lineDF) {
 	# Initialize variables
 	#lineX = c()
@@ -150,7 +150,7 @@ smoothLines=function(lineDF) {
 #'@param type "SpatialGrid" or "SpatialPolygons" or "SpatialPolygonsDataFrame"
 #'@return SpatialGrid, SpatialPolygons, SpatialPolygonsDataFrame
 #'@export pointgrid2SpatialPolygons
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 pointgrid2SpatialPolygons=function(df,type) {
 	# Check that df is a SpatialPointsDataFrame
 	if (class(df)[[1]] != "SpatialPointsDataFrame" & class(df)[[1]] !="SpatialPixelsDataFrame") {
@@ -190,7 +190,7 @@ pointgrid2SpatialPolygons=function(df,type) {
 #'SpatialPointsDataFrame() when reconstructing objects
 #'@return SpatialPolygonsDataFrame or SpatialPointsDataFrame
 #'@export subsetSPDF subset.SpatialPolygonsDataFrame subset.SpatialPointsDataFrame
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 subsetSPDF = function(x,tf,...) {
 	selected_data <- subset(x@data, tf)
 	if(class(x)=="SpatialPolygonsDataFrame") {
@@ -223,7 +223,7 @@ subset.SpatialPointsDataFrame <- function(x,tf,...) {
 #'SpatialPolygonsDataFrame in which to store the polygon areas
 #'@return SpatialPolygonsDataFrame
 #'@export SPDFareas
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 SPDFareas = function(SPDF,colname="AREA") {
 	numPolys <- length(SPDF@polygons)
 	areas <- data.frame(rep(NA,numPolys))
@@ -250,7 +250,7 @@ SPDFareas = function(SPDF,colname="AREA") {
 #'@return SpatialPolygonsDataFrame
 #'@seealso See Also as \code{\link[sp]{overlay}}
 #'@export countPointsInPolys
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 countPointsInPolys = function(points,polys,density=FALSE,by=NULL) {
   countpoints <- function(points,polys) {
     overlay <- over( points, polys, returnList=TRUE) # need to use `,returnList` to get the rownames to be the polygon IDs
@@ -303,7 +303,7 @@ countPointsInPolys = function(points,polys,density=FALSE,by=NULL) {
 #'@return data.frame
 #'@seealso See Also \code{\link{SLDFtoLine}}
 #'@export reshapeSLDF
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 reshapeSLDF = function(SLDF,shape="long") {
 	if(shape=="long"){
 		# Loop over each segment
@@ -346,7 +346,7 @@ reshapeSLDF = function(SLDF,shape="long") {
 #'@return path with points interpolated
 #'@seealso See Also \code{\link{reshapeSLDF}}, \code{\link{SLDFtoLine}}
 #'@export interpolatePathpoints
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 interpolatePathpoints = function(pathpoints,dens,tolerance.min=1.2,tolerance.max=50) {
   #require(taRifx)
 	# dens actually inverse density and is in the units of the x and y in pathpoints (e.g. 1 point per density meters)
@@ -405,7 +405,7 @@ interpolatePathpoints = function(pathpoints,dens,tolerance.min=1.2,tolerance.max
 #'@param vec Character vector of lat/long coordinates
 #'@return Numeric decimal lat/lon
 #'@export cleanLatLon
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 cleanLatLon = function(vec) {
 	if(!is.character(vec))		stop("Input vector must be of type character")
 	vec = sub("[NnEe]","",vec)
@@ -425,7 +425,7 @@ cleanLatLon = function(vec) {
 #'@return A single value that represents the distance along the path
 #'@seealso See Also \code{\link{reshapeSLDF}}, \code{\link{SLDFtoLine}}
 #'@export cumDist
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 cumDist = function(coords) {
 	# coords should be an [n,2] matrix of coordinates
 	
@@ -454,7 +454,7 @@ cumDist = function(coords) {
 #'distances.
 #'@return Returns a SpatialLinesDataFrame
 #'@export lineDist
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 lineDist = function(SLDF, varname="distances") {
 	numSegments = length(SLDF@lines)
 	Dists = rep(NA,numSegments)
@@ -473,7 +473,7 @@ lineDist = function(SLDF, varname="distances") {
 #'in the resulting matrix
 #'@return matrix
 #'@export pointDistPairwise
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 pointDistPairwise = function(SPDF, names = "name") {
 	crds <- SPDF@coords #Coordinate data
 	# Set up our matrix
@@ -496,7 +496,7 @@ pointDistPairwise = function(SPDF, names = "name") {
 #'@param SPDF SpatialPointsDataFrame
 #'@return data.frame with the coordinates as "x" and "y"
 #'@export SPDFtoPointsDF
-#'@import methods rgdal rgeos sp
+#'@import rgdal rgeos sp
 SPDFtoPointsDF <- function(SPDF) {
 	coords <- SPDF@coords
 	colnames(coords) <- c("x","y")
@@ -510,7 +510,7 @@ SPDFtoPointsDF <- function(SPDF) {
 #' @param \dots Pass-alongs
 #' @author Ari B. Friedman
 #' @export
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 #' @rdname IDs
 IDs <- function( x, ... ) {
   UseMethod("IDs",x)
@@ -549,7 +549,7 @@ IDs.SpatialPolygonsDataFrame <- function( x, ... ) {
 #' @method rbind SpatialPolygonsDataFrame
 #' @S3method rbind SpatialPolygonsDataFrame
 #' @export rbind.SpatialPolygonsDataFrame
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
   dots <- as.list(substitute(list(...)))[-1L]
   dots_names <- as.character(dots) # store names of objects passed in to ... so that we can use them to create unique IDs later on
@@ -589,14 +589,13 @@ rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
 #' @param SPDF A SpatialPolygonsDataFrame
 #' @param df A data.frame
 #' @param \dots Parameters to pass to merge.data.frame
-#' 
 #' @export
 #' @import methods rgdal rgeos sp
 #' @docType methods
-#' @rdname merge-methods
-setGeneric("merge", function(x, y, ...){
-  standardGeneric("merge")
-}, useAsDefault=base::merge)
+#[tick-at]rdname merge-methods
+#setGeneric("merge", function(x, y, ...){
+#  standardGeneric("merge")
+#}, useAsDefault=base::merge)
 #' @rdname merge-methods
 #' @aliases merge,SpatialPolygonsDataFrame,data.frame-method
 setMethod(
@@ -627,7 +626,7 @@ setMethod(
 #' @seealso \code{\link{clipToExtent}} which uses the output of this to clip to a bounding box
 #' @return A SpatialPolygons object of the bounding box
 #' @export as.SpatialPolygons.bbox
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 #' @examples
 #' bb <- matrix(c(3,2,5,4),nrow=2)
 #' rownames(bb) <- c("lon","lat")
@@ -661,7 +660,7 @@ as.SpatialPolygons.bbox <- function( bbox, proj4stringFrom=sp::CRS("+proj=longla
 #' @seealso \code{\link{as.SpatialPolygons.bbox}} to create a SP from a bbox
 #' @return A spatial object of the same type
 #' @export clipToExtent
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 #' @examples
 #' set.seed(1)
 #' require(rgdal)
@@ -709,7 +708,7 @@ clipToExtent <- function( sp, extent ) {
 #' @param simplify Whether to simplify to an array or not
 #' @param \dots Arguments to be passed to FUN
 #' @export interpolateAndApplyWithinSpatial
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 #' @return list of length length(crude) where each element is a list of length samplesize containing the results of FUN for that crude-element/sample
 #' @examples
 #' # Not run because too time-consuming
@@ -762,7 +761,7 @@ interpolateAndApplyWithinSpatial <- function( crude, fine, FUN, nSampleCol, samp
 #' @param simplify Whether to simplify to an array or not
 #' @param \dots Arguments to FUN
 #' @export interpolateWithinSingleSpatial
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 #' @return List of FUN's results for each sampling
 interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampleCol, samplesize, simplify=FALSE, ... ) {
   if(length(fineWithin)<=0) {
@@ -793,7 +792,7 @@ interpolateWithinSingleSpatial <- function( crudeSingle, fineWithin, FUN, nSampl
 #' @param replace A logical indicating whether to sample points from fine with replacement or not within each polygon of crude
 #' @param verbose Whether to output detailed error messages
 #' @export interpolatePolyPoint
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 #' @return A SpatialPointsDataFrame containing 
 #' @examples
 #' \dontrun{
@@ -863,7 +862,7 @@ interpolatePolyPoint <- function( crude, fine, weightCol=NULL, nSampleCol=1, rep
 #' @param poly1 SPDF
 #' @param poly2 SPDF
 #' @export overlayPolyPoly
-#' @import methods rgdal rgeos sp
+#' @import rgdal rgeos sp
 #' @return A SPDF with nested polygons of each
 overlayPolyPoly <- function(poly1,poly2) {
   pieces <- list()
