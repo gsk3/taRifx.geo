@@ -127,7 +127,7 @@ geocode.data.frame <- function(x, verbose=FALSE, service="google", returntype="c
     if(class(res)=="try-error") res <- c(NA,NA)
     res
   }
-  latlon <- stack( lapply(x[[addresscol]][sel],gcRobust ))
+  latlon <- taRifx:::stack.list( lapply(x[[addresscol]][sel],gcRobust ))
   rownames(latlon) <- NULL
   latlonDF <- as.data.frame(latlon)
   colnames(latlonDF) <- c("lat","lon")
