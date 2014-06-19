@@ -123,8 +123,9 @@ geocode.data.frame <- function(x, verbose=FALSE, service="google", returntype="c
   }
   # Geocode
   gcRobust <- function(a) {
-    res <- try(geocode(a,verbose=verbose,service=service,...))
-    if(class(res)=="try-error") res <- c(NA,NA)
+    res <- try(geocode(a, verbose = verbose, service = service, ...))
+    if ( class(res) == "try-error" | ( is.na(res) & length(res)==1 ) )
+      res <- c(NA, NA)
     res
   }
   latlon <- taRifx:::stack.list( lapply(x[[addresscol]][sel],gcRobust ))
