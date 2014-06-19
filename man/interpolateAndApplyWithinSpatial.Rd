@@ -8,8 +8,8 @@ positional uncertainty inherent in not knowing the exact location of each entity
 makes up the count.  Instead, we repeatedly sample N points from the census block group centroids
 which lie within our polygon, weight them by their population, and compute distances from there.}
 \usage{
-  interpolateAndApplyWithinSpatial(crude, fine, FUN,
-    nSampleCol, samplesize = 30, simplify = FALSE, ...)
+interpolateAndApplyWithinSpatial(crude, fine, FUN, nSampleCol,
+  samplesize = 30, simplify = FALSE, ...)
 }
 \arguments{
   \item{crude}{A SpatialPolygonsDataFrame containing the
@@ -33,23 +33,22 @@ which lie within our polygon, weight them by their population, and compute dista
   \item{\dots}{Arguments to be passed to FUN}
 }
 \value{
-  list of length length(crude) where each element is a list
-  of length samplesize containing the results of FUN for
-  that crude-element/sample
+list of length length(crude) where each element is a list
+of length samplesize containing the results of FUN for that
+crude-element/sample
 }
 \description{
-  Generic function to interpolate from a polygon to points
-  lying inside it This function was designed to solve the
-  following problem.  Suppose you have counts of the number
-  of entities inside a polygon (N).  To compute distances
-  to a point, you might take the distance from the polygon
-  centroid.  But this is too simplistic--it discards the
-  positional uncertainty inherent in not knowing the exact
-  location of each entity which makes up the count.
-  Instead, we repeatedly sample N points from the census
-  block group centroids which lie within our polygon,
-  weight them by their population, and compute distances
-  from there.
+Generic function to interpolate from a polygon to points
+lying inside it This function was designed to solve the
+following problem.  Suppose you have counts of the number
+of entities inside a polygon (N).  To compute distances to
+a point, you might take the distance from the polygon
+centroid.  But this is too simplistic--it discards the
+positional uncertainty inherent in not knowing the exact
+location of each entity which makes up the count.  Instead,
+we repeatedly sample N points from the census block group
+centroids which lie within our polygon, weight them by
+their population, and compute distances from there.
 }
 \examples{
 # Not run because too time-consuming

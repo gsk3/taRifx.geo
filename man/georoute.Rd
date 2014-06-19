@@ -3,11 +3,10 @@
 \alias{georoute.default}
 \title{Find driving routes using online services}
 \usage{
-  georoute(x, verbose = FALSE, service = "bing",
-    returntype = "all", ...)
+georoute(x, verbose = FALSE, service = "bing", returntype = "all", ...)
 
-  \method{georoute}{default} (x, verbose = FALSE,
-    service = "bing", returntype = "all", ...)
+\method{georoute}{default}(x, verbose = FALSE, service = "bing",
+  returntype = "all", ...)
 }
 \arguments{
   \item{x}{A character vector of length>=2, where each
@@ -28,10 +27,10 @@
   \item{\dots}{Other items to pass along}
 }
 \value{
-  Route information (see the returntype argument)
+Route information (see the returntype argument)
 }
 \description{
-  Find transit routes using Google or Bing's API
+Find transit routes using Google or Bing's API
 }
 \examples{
 \dontrun{
@@ -53,6 +52,6 @@ georoute( xmat, verbose=TRUE, returntype = c("distance","distanceUnit") )
 }
 }
 \author{
-  Ari B. Friedman
+Ari B. Friedman
 }
 

@@ -29,7 +29,3 @@ Imports:
     rgeos,
     RCurl,
     methods
-Collate:
-    'Contributed.R'
-    'R-GIS.R'
-    'data.R'

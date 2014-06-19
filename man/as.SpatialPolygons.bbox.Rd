@@ -3,9 +3,9 @@
 \title{Convert a bounding box to a SpatialPolygons object
 Bounding box is first created (in lat/lon) then projected if specified}
 \usage{
-  as.SpatialPolygons.bbox(bbox,
-    proj4stringFrom = sp::CRS("+proj=longlat +datum=WGS84"),
-    proj4stringTo = NULL, interpolate = 0)
+as.SpatialPolygons.bbox(bbox,
+  proj4stringFrom = sp::CRS("+proj=longlat +datum=WGS84"),
+  proj4stringTo = NULL, interpolate = 0)
 }
 \arguments{
   \item{bbox}{Bounding box: a 2x2 numerical matrix of
@@ -23,12 +23,12 @@ Bounding box is first created (in lat/lon) then projected if specified}
   projecting)}
 }
 \value{
-  A SpatialPolygons object of the bounding box
+A SpatialPolygons object of the bounding box
 }
 \description{
-  Convert a bounding box to a SpatialPolygons object
-  Bounding box is first created (in lat/lon) then projected
-  if specified
+Convert a bounding box to a SpatialPolygons object Bounding
+box is first created (in lat/lon) then projected if
+specified
 }
 \examples{
 bb <- matrix(c(3,2,5,4),nrow=2)
@@ -37,7 +37,7 @@ colnames(bb) <- c('min','max')
 as.SpatialPolygons.bbox( bb )
 }
 \seealso{
-  \code{\link{clipToExtent}} which uses the output of this
-  to clip to a bounding box
+\code{\link{clipToExtent}} which uses the output of this to
+clip to a bounding box
 }
 

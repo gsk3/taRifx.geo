@@ -4,7 +4,7 @@
 \alias{subsetSPDF}
 \title{Subset SpatialPolygonsDataFrame or SpatialPointsDataFrame}
 \usage{
-  subsetSPDF(x, tf, ...)
+subsetSPDF(x, tf, ...)
 }
 \arguments{
   \item{x}{SpatialPolygonsDataFrame or
@@ -17,9 +17,9 @@
   when reconstructing objects}
 }
 \value{
-  SpatialPolygonsDataFrame or SpatialPointsDataFrame
+SpatialPolygonsDataFrame or SpatialPointsDataFrame
 }
 \description{
-  Subset SpatialPolygonsDataFrame or SpatialPointsDataFrame
+Subset SpatialPolygonsDataFrame or SpatialPointsDataFrame
 }
 

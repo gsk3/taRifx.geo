@@ -6,15 +6,15 @@
 \alias{IDs<-.SpatialPolygonsDataFrame}
 \title{Get sp feature IDs}
 \usage{
-  IDs(x, ...)
+IDs(x, ...)
 
-  \method{IDs}{default} (x, ...)
+\method{IDs}{default}(x, ...)
 
-  \method{IDs}{SpatialPolygonsDataFrame} (x, ...)
+\method{IDs}{SpatialPolygonsDataFrame}(x, ...)
 
-  IDs(x) <- value
+IDs(x) <- value
 
-  IDs(x) <- value
+IDs(x) <- value
 }
 \arguments{
   \item{x}{The object to get the IDs from or assign to}
@@ -24,11 +24,11 @@
   \item{\dots}{Pass-alongs}
 }
 \description{
-  Get sp feature IDs
+Get sp feature IDs
 
-  Assign sp feature IDs
+Assign sp feature IDs
 }
 \author{
-  Ari B. Friedman
+Ari B. Friedman
 }
 

@@ -4,15 +4,14 @@
 \alias{geocode.default}
 \title{Geocode character vectors using online services}
 \usage{
-  geocode(x, verbose = FALSE, service = "google",
-    returntype = "coordinates", ...)
+geocode(x, verbose = FALSE, service = "google",
+  returntype = "coordinates", ...)
 
-  \method{geocode}{default} (x, verbose = FALSE,
-    service = "google", returntype = "coordinates", ...)
+\method{geocode}{default}(x, verbose = FALSE, service = "google",
+  returntype = "coordinates", ...)
 
-  \method{geocode}{data.frame} (x, verbose = FALSE,
-    service = "google", returntype = "coordinates",
-    addresscol = "address", ...)
+\method{geocode}{data.frame}(x, verbose = FALSE, service = "google",
+  returntype = "coordinates", addresscol = "address", ...)
 }
 \arguments{
   \item{x}{A vector or data.frame}
@@ -33,14 +32,14 @@
   \item{\dots}{Other items to pass along}
 }
 \value{
-  geocode.default returns a numeric vector of length 2
-  containing the latitudes and longitudes.
-  geocode.data.frame returns the original data.frame with
-  two additional columns for the longitude and latitudes.
+geocode.default returns a numeric vector of length 2
+containing the latitudes and longitudes. geocode.data.frame
+returns the original data.frame with two additional columns
+for the longitude and latitudes.
 }
 \description{
-  Geocode character vectors (or data.frames) using Google
-  or Bing's API
+Geocode character vectors (or data.frames) using Google or
+Bing's API
 }
 \examples{
 \dontrun{
@@ -54,8 +53,8 @@ geocode(dat)
 }
 }
 \author{
-  Error handling, object orientation, and Bing capabilities
-  by Ari Friedman. Google REST algorithm by Tony Breyal
-  (http://stackoverflow.com/a/3259537/636656).
+Error handling, object orientation, and Bing capabilities
+by Ari Friedman. Google REST algorithm by Tony Breyal
+(http://stackoverflow.com/a/3259537/636656).
 }
 

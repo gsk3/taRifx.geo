@@ -3,7 +3,7 @@
 \title{Restrict to extent of a polygon
 Currently does the sloppy thing and returns any object that has any area inside the extent polygon}
 \usage{
-  clipToExtent(sp, extent)
+clipToExtent(sp, extent)
 }
 \arguments{
   \item{sp}{Spatial object}
@@ -12,12 +12,12 @@ Currently does the sloppy thing and returns any object that has any area inside 
   not within a polygon will be discarded}
 }
 \value{
-  A spatial object of the same type
+A spatial object of the same type
 }
 \description{
-  Restrict to extent of a polygon Currently does the sloppy
-  thing and returns any object that has any area inside the
-  extent polygon
+Restrict to extent of a polygon Currently does the sloppy
+thing and returns any object that has any area inside the
+extent polygon
 }
 \examples{
 set.seed(1)
@@ -45,7 +45,7 @@ plot( plyClip, add=TRUE, border="red")
 plot( pntClip, add=TRUE, col="red", pch="o")
 }
 \seealso{
-  \code{\link{as.SpatialPolygons.bbox}} to create a SP from
-  a bbox
+\code{\link{as.SpatialPolygons.bbox}} to create a SP from a
+bbox
 }
 

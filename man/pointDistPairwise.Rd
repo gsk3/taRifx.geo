@@ -2,7 +2,7 @@
 \alias{pointDistPairwise}
 \title{Create all pairwise distances of points from a SpatialPointsDataFrame}
 \usage{
-  pointDistPairwise(SPDF, names = "name")
+pointDistPairwise(SPDF, names = "name")
 }
 \arguments{
   \item{SPDF}{SpatialPointsDataFrame}
@@ -11,10 +11,10 @@
   to label each point in the resulting matrix}
 }
 \value{
-  matrix
+matrix
 }
 \description{
-  Create all pairwise distances of points from a
-  SpatialPointsDataFrame
+Create all pairwise distances of points from a
+SpatialPointsDataFrame
 }
 

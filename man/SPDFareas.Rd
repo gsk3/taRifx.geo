@@ -2,7 +2,7 @@
 \alias{SPDFareas}
 \title{Return areas of polygons in a SpatialPolygonsDataFrame}
 \usage{
-  SPDFareas(SPDF, colname = "AREA")
+SPDFareas(SPDF, colname = "AREA")
 }
 \arguments{
   \item{SPDF}{SpatialPolygonsDataFrame}
@@ -12,10 +12,10 @@
   store the polygon areas}
 }
 \value{
-  SpatialPolygonsDataFrame
+SpatialPolygonsDataFrame
 }
 \description{
-  Get the areas stored in the polygons and return them in
-  the dataframe slot
+Get the areas stored in the polygons and return them in the
+dataframe slot
 }
 

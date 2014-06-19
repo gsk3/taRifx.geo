@@ -2,8 +2,8 @@
 \alias{interpolatePathpoints}
 \title{Interpolate points along a path}
 \usage{
-  interpolatePathpoints(pathpoints, dens,
-    tolerance.min = 1.2, tolerance.max = 50)
+interpolatePathpoints(pathpoints, dens, tolerance.min = 1.2,
+  tolerance.max = 50)
 }
 \arguments{
   \item{pathpoints}{Path points as they currently exist}
@@ -19,13 +19,13 @@
   \code{tolerance.min} )}
 }
 \value{
-  path with points interpolated
+path with points interpolated
 }
 \description{
-  Interpolate points along a path
+Interpolate points along a path
 }
 \seealso{
-  See Also \code{\link{reshapeSLDF}},
-  \code{\link{SLDFtoLine}}
+See Also \code{\link{reshapeSLDF}},
+\code{\link{SLDFtoLine}}
 }
 

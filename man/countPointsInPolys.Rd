@@ -2,8 +2,7 @@
 \alias{countPointsInPolys}
 \title{Count points within a polygon}
 \usage{
-  countPointsInPolys(points, polys, density = FALSE,
-    by = NULL)
+countPointsInPolys(points, polys, density = FALSE, by = NULL)
 }
 \arguments{
   \item{points}{SpatialPoints}
@@ -21,13 +20,13 @@
   length(points).}
 }
 \value{
-  SpatialPolygonsDataFrame
+SpatialPolygonsDataFrame
 }
 \description{
-  Overlays points on polygons and create a new polygon
-  dataset with the count of the points in that polygon
+Overlays points on polygons and create a new polygon
+dataset with the count of the points in that polygon
 }
 \seealso{
-  See Also as \code{\link[sp]{overlay}}
+See Also as \code{\link[sp]{overlay}}
 }
 

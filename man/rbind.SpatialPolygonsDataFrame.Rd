@@ -2,8 +2,7 @@
 \alias{rbind.SpatialPolygonsDataFrame}
 \title{rbind SpatialPolygonsDataFrames together, fixing IDs if duplicated}
 \usage{
-  \method{rbind}{SpatialPolygonsDataFrame} (...,
-    fix.duplicated.IDs = TRUE)
+\method{rbind}{SpatialPolygonsDataFrame}(..., fix.duplicated.IDs = TRUE)
 }
 \arguments{
   \item{\dots}{SpatialPolygonsDataFrame(s) to rbind
@@ -13,14 +12,14 @@
   IDs or not}
 }
 \value{
-  SpatialPolygonsDataFrame
+SpatialPolygonsDataFrame
 }
 \description{
-  rbind SpatialPolygonsDataFrames together, fixing IDs if
-  duplicated
+rbind SpatialPolygonsDataFrames together, fixing IDs if
+duplicated
 }
 \author{
-  Ari B. Friedman, with key functionality by csfowler on
-  StackExchange
+Ari B. Friedman, with key functionality by csfowler on
+StackExchange
 }
 

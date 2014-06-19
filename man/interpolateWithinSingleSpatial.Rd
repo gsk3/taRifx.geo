@@ -3,8 +3,8 @@
 \title{Interpolate and sample within a single polygon
 (Called by interpolateWithinSpatial)}
 \usage{
-  interpolateWithinSingleSpatial(crudeSingle, fineWithin,
-    FUN, nSampleCol, samplesize, simplify = FALSE, ...)
+interpolateWithinSingleSpatial(crudeSingle, fineWithin, FUN, nSampleCol,
+  samplesize, simplify = FALSE, ...)
 }
 \arguments{
   \item{crudeSingle}{A single polygon}
@@ -26,10 +26,10 @@
   \item{\dots}{Arguments to FUN}
 }
 \value{
-  List of FUN's results for each sampling
+List of FUN's results for each sampling
 }
 \description{
-  Interpolate and sample within a single polygon (Called by
-  interpolateWithinSpatial)
+Interpolate and sample within a single polygon (Called by
+interpolateWithinSpatial)
 }
 

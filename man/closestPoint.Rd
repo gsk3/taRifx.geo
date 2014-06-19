@@ -2,7 +2,7 @@
 \alias{closestPoint}
 \title{Find closest point to a given point's coordinates (closestPoint).}
 \usage{
-  closestPoint(point, points)
+closestPoint(point, points)
 }
 \arguments{
   \item{points}{points is an Nx2 matrix, where columns are
@@ -12,10 +12,10 @@
   closest match in points}
 }
 \value{
-  Distance, in same units as input
+Distance, in same units as input
 }
 \description{
-  Find closest point to a given point's coordinates
-  (closestPoint).
+Find closest point to a given point's coordinates
+(closestPoint).
 }
 

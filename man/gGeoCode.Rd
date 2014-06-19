@@ -3,13 +3,13 @@
 \title{Geocode using Google Maps API (deprecated)
 This has been generalized to the taRifx::geocode() function}
 \usage{
-  gGeoCode(...)
+gGeoCode(...)
 }
 \arguments{
   \item{\dots}{Ignored}
 }
 \description{
-  Geocode using Google Maps API (deprecated) This has been
-  generalized to the taRifx::geocode() function
+Geocode using Google Maps API (deprecated) This has been
+generalized to the taRifx::geocode() function
 }
 

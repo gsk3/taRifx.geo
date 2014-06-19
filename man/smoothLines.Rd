@@ -2,20 +2,19 @@
 \alias{smoothLines}
 \title{Smooth the line segments in a SpatialLinesDataFrame}
 \usage{
-  smoothLines(lineDF)
+smoothLines(lineDF)
 }
 \arguments{
   \item{lineDF}{SpatialLinesDataFrame}
 }
 \value{
-  SpatialLinesDataFrame
+SpatialLinesDataFrame
 }
 \description{
-  Smooth the line segments in a SpatialLinesDataFrame.
-  Takes a jittery SLDF (such as a GPS produces) and smooths
-  it.
+Smooth the line segments in a SpatialLinesDataFrame.  Takes
+a jittery SLDF (such as a GPS produces) and smooths it.
 }
 \seealso{
-  See Also as \code{\link{SLDFtoLine}}, ~~~
+See Also as \code{\link{SLDFtoLine}}, ~~~
 }
 

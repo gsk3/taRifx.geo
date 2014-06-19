@@ -4,8 +4,8 @@
 This function returns (weighted) sample points in fine for every polygon in crude.
 Thus running it repeatedly gives you useful variation that reflects the interpolation uncertainty.}
 \usage{
-  interpolatePolyPoint(crude, fine, weightCol = NULL,
-    nSampleCol = 1, replace = TRUE, verbose = FALSE)
+interpolatePolyPoint(crude, fine, weightCol = NULL, nSampleCol = 1,
+  replace = TRUE, verbose = FALSE)
 }
 \arguments{
   \item{crude}{A SpatialPolygonsDataFrame.}
@@ -26,14 +26,13 @@ Thus running it repeatedly gives you useful variation that reflects the interpol
   \item{verbose}{Whether to output detailed error messages}
 }
 \value{
-  A SpatialPointsDataFrame containing
+A SpatialPointsDataFrame containing
 }
 \description{
-  Interpolate points from polygon SPDF This function
-  returns (weighted) sample points in fine for every
-  polygon in crude. Thus running it repeatedly gives you
-  useful variation that reflects the interpolation
-  uncertainty.
+Interpolate points from polygon SPDF This function returns
+(weighted) sample points in fine for every polygon in
+crude. Thus running it repeatedly gives you useful
+variation that reflects the interpolation uncertainty.
 }
 \examples{
 \dontrun{

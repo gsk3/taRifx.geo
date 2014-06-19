@@ -10,8 +10,7 @@
 \alias{polySP}
 \title{Entirely fabricated spatial data for taRifx.geo examples}
 \description{
-  Entirely fabricated spatial data for taRifx.geo examples
+Entirely fabricated spatial data for taRifx.geo examples
 }
 \keyword{data}
-\keyword{datasets}
 
