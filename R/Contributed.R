@@ -37,7 +37,7 @@ geocode <- function( x, verbose=FALSE, service="google", returntype="coordinates
 #'@method geocode default
 #'@S3method geocode default
 geocode.default <- function(x,verbose=FALSE, service="google", returntype="coordinates", ...) {
-  if(x=="") return(c(NA,NA))
+  if( is.na( x ) | gsub(" *", "", x) == ""  ) return(c(NA,NA))
   # Input regularization and checking
   service <- tolower(service)
   BingMapsKey <- getOption("BingMapsKey")
