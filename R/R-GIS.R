@@ -248,14 +248,13 @@ SPDFareas = function(SPDF,colname="AREA") {
 #'a factor with two levels, instead of a single count variable being returned, two variables will be returned--
 #'the count of point type A in the polygon, and the count of point type B.  The by factor must be of length length(points).
 #'@return SpatialPolygonsDataFrame
-#'@seealso See Also as \code{\link[sp]{overlay}}
 #'@export countPointsInPolys
 #'@import rgdal rgeos sp
 countPointsInPolys = function(points,polys,density=FALSE,by=NULL) {
   countpoints <- function(points,polys) {
-    overlay <- over( points, polys, returnList=TRUE) # need to use `,returnList` to get the rownames to be the polygon IDs
-    overlayIDs <- unlist(lapply( overlay, function(x) rownames(x) )) # vector of polygon IDs, repeated if there's more than one point in the polygon
-    unclass(table(overlayIDs))
+    ovrlay <- over( points, polys, returnList=TRUE) # need to use `,returnList` to get the rownames to be the polygon IDs
+    ovrlayIDs <- unlist(lapply( ovrlay, function(x) rownames(x) )) # vector of polygon IDs, repeated if there's more than one point in the polygon
+    unclass(table(ovrlayIDs))
   }
   if(is.null(by)) {
     pointcount <- countpoints(points,polys)
@@ -742,9 +741,10 @@ clipToExtent <- function( sp, extent ) {
 #' } )
 #' } # end of dontrun
 interpolateAndApplyWithinSpatial <- function( crude, fine, FUN, nSampleCol, samplesize=30, simplify=FALSE, ... ) {
+  warning("This used to use sp::overlay and now uses sp::over without any testing, after overlay was deprecated. Results are likely to be erratic.")
   lapply( seq(length(crude)), function(i) {
     crudeSingle <- crude[i,]
-    fineWithin <- fine[as.logical(!is.na(overlay( crudeSingle, fine ))),]
+    fineWithin <- fine[as.logical(!is.na(sp::over( crudeSingle, fine ))),] # Changed sp::overlay to sp::over. Untested.
     ellipsisList <- list(...)
     ellipsisList$crudeSingle=crudeSingle;ellipsisList$fineWithin=fineWithin;ellipsisList$FUN=FUN;ellipsisList$nSampleCol=nSampleCol; ellipsisList$samplesize=samplesize
     do.call( interpolateWithinSingleSpatial, ellipsisList )
