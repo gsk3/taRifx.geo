@@ -557,7 +557,7 @@ rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
   # Check IDs for duplicates and fix if indicated
   IDs_list <- lapply(dots,IDs)
   dups.sel <- duplicated(unlist(IDs_list))
-  if( any(dups.sel) ) {
+  while( any(dups.sel) ) {
     if(fix.duplicated.IDs) {
       dups <- unique(unlist(IDs_list)[dups.sel])
       # Function that takes a SPDF, a string to prepend to the badID, and a character vector of bad IDs
@@ -570,14 +570,19 @@ rbind.SpatialPolygonsDataFrame <- function(..., fix.duplicated.IDs=TRUE) {
     } else {
       stop("There are duplicated IDs, and fix.duplicated.IDs is not TRUE.")
     }
-  } else { # Confirm that IDs match associated data.frame rownames
-    broken_IDs <- vapply( dots, function(x) all(IDs(x)!=rownames(x@data)), FALSE )
-    if( any(broken_IDs) ) {
+    
+    dups.sel <- duplicated(unlist(IDs_list))
+  } 
+  
+  # Confirm that IDs match associated data.frame rownames
+  broken_IDs <- vapply( dots, function(x) all(IDs(x)!=rownames(x@data)), FALSE )
+  
+  if( any(broken_IDs) ) {
       for( i in which(broken_IDs) ) {
         rownames( dots[[i]]@data ) <- IDs(dots[[i]])
       }
-    }
   }
+ 
   # One call to bind them all
   pl = do.call("rbind", lapply(dots, function(x) as(x, "SpatialPolygons")))
   df = do.call("rbind", lapply(dots, function(x) x@data))
